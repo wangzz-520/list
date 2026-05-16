@@ -1,7 +1,7 @@
 <view class="page-wrap">
   <view class="hero">
     <view class="hero-title">选择困难症助手</view>
-    <view class="hero-sub">把选项写下来，剩下的交给小小随机。</view>
+    <view class="hero-sub">把选项写下来，剩下的交给小小随机。选完还能保存成清单继续复用。</view>
   </view>
 
   <view class="container">
@@ -17,7 +17,7 @@
     </view>
 
     <view class="form-card">
-      <view class="label">这次要决定什么</view>
+      <view class="label">这次要决定什么？</view>
       <input
         class="title-input"
         value="{{title}}"
@@ -40,6 +40,18 @@
       </view>
 
       <button class="add-option-btn" bindtap="addOption">添加一个选项</button>
+
+      <view class="option-setting">
+        <view class="setting-copy">
+          <view class="setting-title">排除上次结果</view>
+          <view class="setting-desc">连续选择时，尽量不重复刚选中的结果</view>
+        </view>
+        <switch
+          checked="{{excludeLastResult}}"
+          color="#2f6fed"
+          bindchange="onExcludeChange"
+        />
+      </view>
     </view>
 
     <view wx:if="{{result}}" class="result-card">
@@ -51,10 +63,11 @@
       <button class="choose-btn" bindtap="chooseOne">帮我选一个</button>
       <button class="reset-btn" bindtap="resetOptions">重填</button>
     </view>
+    <button class="save-list-btn" bindtap="saveAsChecklist">保存为选择清单</button>
 
     <view class="section-title history-title">最近选择</view>
     <view wx:if="{{history.length === 0}}" class="empty-card">
-      <view class="empty-icon">🎲</view>
+      <image class="empty-icon" src="/assets/icons/dice.svg" mode="aspectFit"></image>
       <view class="empty-text">还没有选择记录</view>
     </view>
 

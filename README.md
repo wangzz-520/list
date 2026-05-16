@@ -18,7 +18,6 @@
 pages/index/index          首页：搜索、热门分类、热门清单、最近使用
 pages/category/category    分类：按场景查看模板
 pages/checklist/checklist  清单详情：勾选、进度、收藏、添加、删除、重置、分享
-pages/custom/custom        新建自定义清单
 pages/mine/mine            我的：收藏、自定义清单、反馈、云端同步、本地数据管理
 ```
 

@@ -1,6 +1,6 @@
 .page-wrap {
   min-height: 100vh;
-  background: #f6f8fb;
+  background: #f4f7fc;
 }
 
 .tab-bar {
@@ -56,6 +56,39 @@
   transform: translateX(-50%);
 }
 
+.search-wrap {
+  padding: 20rpx 24rpx 0;
+  background: #f4f7fc;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 26rpx;
+  background: #ffffff;
+  border: 1rpx solid #e3ebf7;
+  border-radius: 22rpx;
+  box-shadow: 0 12rpx 28rpx rgba(31, 53, 94, 0.06);
+}
+
+.search-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 12rpx;
+}
+
+.search-input {
+  flex: 1;
+  height: 100%;
+  color: #172033;
+  font-size: 28rpx;
+}
+
+.search-placeholder {
+  color: #a3afc2;
+}
+
 .cat-header {
   display: flex;
   align-items: center;
@@ -92,13 +125,22 @@
 
 .container {
   padding: 22rpx 24rpx 0;
+  background: #f4f7fc;
+}
+
+.search-title {
+  padding: 4rpx 4rpx 16rpx;
+  color: #4d5f7a;
+  font-size: 27rpx;
+  font-weight: 800;
 }
 
 .cell-group {
   overflow: hidden;
   background: #ffffff;
-  border: 1rpx solid #e8edf6;
-  border-radius: 16rpx;
+  border: 1rpx solid #e5ebf5;
+  border-radius: 20rpx;
+  box-shadow: 0 12rpx 34rpx rgba(31, 53, 94, 0.06);
 }
 
 .list-cell {
@@ -167,7 +209,9 @@
 }
 
 .empty-icon {
-  font-size: 68rpx;
+  width: 92rpx;
+  height: 92rpx;
+  opacity: 0.78;
 }
 
 .empty-text {

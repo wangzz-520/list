@@ -56,7 +56,9 @@
     "schemaVersion": 1,
     "drafts": {},
     "favorites": [],
+    "pinnedTemplates": [],
     "recents": [],
+    "completedLists": [],
     "customLists": [],
     "feedbacks": [],
     "clientExportedAt": 1710000000000
@@ -86,7 +88,7 @@
 
 ## shared_lists
 
-用途：保存共享清单快照。第一版只创建云端快照，后续可扩展为多人协作。
+用途：保存共享清单快照。第一版用于分享后按 `shareId` 读取快照，后续可扩展为多人协作。
 
 字段：
 
@@ -102,3 +104,9 @@
   "updatedAt": "serverDate"
 }
 ```
+
+读取规则：
+
+- 前端不直接读取集合。
+- 创建和读取均通过 `createShareList` 云函数。
+- 读取时只返回 `status = active` 的快照，不返回 `_openid`。

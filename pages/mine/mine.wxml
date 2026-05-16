@@ -1,112 +1,128 @@
 <view class="page-wrap">
-
-  <!-- ─── 个人信息头部 ─── -->
   <view class="profile-header">
-    <view class="avatar-wrap">
-      <view class="avatar">✅</view>
-    </view>
-    <view class="profile-name">万能生活清单</view>
-    <view class="profile-sub">本地优先 · 支持微信云同步</view>
-  </view>
-
-  <!-- ─── 主内容 ─── -->
-  <view class="main-content">
-
-    <!-- 我的收藏 -->
-    <view class="group-title">我的收藏</view>
-    <view wx:if="{{favoriteTemplates.length === 0}}" class="empty-card">
-      <view class="empty-icon">🤍</view>
-      <view class="empty-text">暂无收藏，打开清单后可以收藏</view>
-    </view>
-    <view class="cell-group" wx:if="{{favoriteTemplates.length > 0}}">
-      <view
-        wx:for="{{favoriteTemplates}}"
-        wx:key="id"
-        class="list-cell"
-        data-id="{{item.id}}"
-        bindtap="goChecklist"
-        hover-class="cell-hover"
-      >
-        <view class="cell-icon">{{item.icon}}</view>
-        <view class="cell-body">
-          <view class="cell-title">{{item.title}}</view>
-          <view class="cell-desc">{{item.description}}</view>
-        </view>
-        <text class="cell-arrow">›</text>
+    <view class="profile-top">
+      <image class="avatar" src="/assets/icons/logo.svg" mode="aspectFit"></image>
+      <view class="profile-copy">
+        <view class="profile-name">我的清单中心</view>
+        <view class="profile-sub">{{syncStatusText}} · {{lastSyncText}}</view>
       </view>
     </view>
+    <view class="stat-row">
+      <view class="stat-item">
+        <view class="stat-num">{{stats.customCount || 0}}</view>
+        <view class="stat-label">我的清单</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-num">{{stats.completedCount || 0}}</view>
+        <view class="stat-label">最近完成</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-num">{{stats.pinnedCount || 0}}</view>
+        <view class="stat-label">常用</view>
+      </view>
+    </view>
+  </view>
 
-    <!-- 我的自定义清单 -->
-    <view class="group-title">我的清单</view>
+  <view class="main-content">
+    <view class="sync-card">
+      <view class="settings-left">
+        <image class="settings-icon-img" src="/assets/icons/cloud.svg" mode="aspectFit"></image>
+        <view class="settings-info">
+          <view class="settings-name">数据同步状态</view>
+          <view class="settings-sub">{{syncDesc}}</view>
+        </view>
+      </view>
+      <button class="sync-btn" bindtap="syncCloudNow" loading="{{syncing}}">同步</button>
+    </view>
+
+    <view class="section-row">
+      <view class="group-title">我的清单</view>
+    </view>
     <view wx:if="{{customLists.length === 0}}" class="empty-card">
-      <view class="empty-icon">📝</view>
-      <view class="empty-text">暂无自定义清单，去「新建」创建一个</view>
+      <image class="empty-icon" src="/assets/icons/edit.svg" mode="aspectFit"></image>
+      <view class="empty-text">从模板生成或选择助手保存的清单会出现在这里</view>
     </view>
     <view class="cell-group" wx:if="{{customLists.length > 0}}">
       <view wx:for="{{customLists}}" wx:key="id" class="list-cell">
-        <view class="cell-icon-wrap" data-id="{{item.id}}" bindtap="goChecklist">
+        <view class="cell-main" data-id="{{item.id}}" bindtap="goChecklist">
           <view class="cell-icon">{{item.icon}}</view>
+          <view class="cell-body">
+            <view class="cell-title">{{item.title}}</view>
+            <view class="cell-desc">{{item.description}}</view>
+          </view>
         </view>
-        <view class="cell-body" data-id="{{item.id}}" bindtap="goChecklist">
-          <view class="cell-title">{{item.title}}</view>
-          <view class="cell-desc">{{item.description}}</view>
-        </view>
-        <view class="cell-delete" data-id="{{item.id}}" bindtap="removeCustom">删除</view>
+        <button class="text-btn" data-id="{{item.id}}" catchtap="copyList">复制</button>
+        <button class="text-btn danger" data-id="{{item.id}}" catchtap="removeCustom">删除</button>
       </view>
     </view>
 
-    <!-- 云端同步 -->
-    <view class="group-title">数据管理</view>
-    <view class="settings-group">
-      <view class="settings-cell" bindtap="goChallenge">
-        <view class="settings-left">
-          <view class="settings-icon">🔥</view>
-          <view class="settings-info">
-            <view class="settings-name">每日打卡挑战</view>
-            <view class="settings-sub">{{challenge.todayChecked ? '今日已完成' : '今日待打卡'}} · 连续 {{challenge.streak || 0}} 天</view>
+    <view class="group-title">最近完成</view>
+    <view wx:if="{{completedLists.length === 0}}" class="empty-card compact">
+      <view class="empty-text">完成一张清单后会自动记录在这里</view>
+    </view>
+    <view class="cell-group" wx:if="{{completedLists.length > 0}}">
+      <view wx:for="{{completedLists}}" wx:key="completedAt" class="list-cell">
+        <view
+          class="cell-main"
+          data-id="{{item.id}}"
+          data-share-id="{{item.shareId}}"
+          bindtap="goChecklist"
+        >
+          <view class="cell-icon done">{{item.icon}}</view>
+          <view class="cell-body">
+            <view class="cell-title">{{item.title}}</view>
+            <view class="cell-desc">{{item.completedDate}} · 已完成 {{item.progress.done || item.progress.total || 0}} 项</view>
           </view>
         </view>
-        <text class="settings-arrow">›</text>
+        <button class="text-btn" data-id="{{item.id}}" catchtap="copyList">复用</button>
       </view>
-      <view class="cell-divider"></view>
+    </view>
+
+    <view class="group-title">常用清单</view>
+    <view wx:if="{{pinnedTemplates.length === 0}}" class="empty-card compact">
+      <view class="empty-text">打开模板清单后点“常用”，这里会集中管理</view>
+    </view>
+    <view class="cell-group" wx:if="{{pinnedTemplates.length > 0}}">
+      <view wx:for="{{pinnedTemplates}}" wx:key="id" class="list-cell">
+        <view class="cell-main" data-id="{{item.id}}" bindtap="goChecklist">
+          <view class="cell-icon">{{item.icon}}</view>
+          <view class="cell-body">
+            <view class="cell-title">{{item.title}}</view>
+            <view class="cell-desc">{{item.description}}</view>
+          </view>
+        </view>
+        <button class="text-btn danger" data-id="{{item.id}}" catchtap="unpinTemplate">取消</button>
+      </view>
+    </view>
+
+    <view class="group-title">工具与数据</view>
+    <view class="settings-group">
       <view class="settings-cell" bindtap="goDecision">
         <view class="settings-left">
-          <view class="settings-icon">🎲</view>
+          <image class="settings-icon-img" src="/assets/icons/dice.svg" mode="aspectFit"></image>
           <view class="settings-info">
             <view class="settings-name">选择困难症助手</view>
-            <view class="settings-sub">几个选项犹豫不决时，帮你快速选一个</view>
+            <view class="settings-sub">把选择结果保存为清单</view>
           </view>
         </view>
         <text class="settings-arrow">›</text>
-      </view>
-      <view class="cell-divider"></view>
-      <view class="settings-cell">
-        <view class="settings-left">
-          <view class="settings-icon sync-icon">☁️</view>
-          <view class="settings-info">
-            <view class="settings-name">云端同步</view>
-            <view class="settings-sub">{{cloudEnabled ? '云开发已启用' : '当前使用本地缓存'}}</view>
-          </view>
-        </view>
-        <button class="sync-btn" bindtap="syncCloudNow" loading="{{syncing}}">同步</button>
       </view>
       <view class="cell-divider"></view>
       <view class="settings-cell danger-cell" bindtap="clearAll">
         <view class="settings-left">
-          <view class="settings-icon danger-icon">🗑️</view>
+          <image class="settings-icon-img" src="/assets/icons/trash.svg" mode="aspectFit"></image>
           <view class="settings-name danger-text">清空本地数据</view>
         </view>
         <text class="settings-arrow">›</text>
       </view>
     </view>
 
-    <!-- 意见反馈 -->
     <view class="group-title">意见反馈</view>
     <view class="feedback-card">
       <textarea
         class="feedback-textarea"
         value="{{feedbackText}}"
-        placeholder="例如：希望增加宠物出行清单、旅游目的地清单……"
+        placeholder="例如：希望增加宠物出行清单、旅行目的地清单……"
         placeholder-class="input-placeholder"
         bindinput="onFeedbackInput"
         maxlength="200"
@@ -116,5 +132,4 @@
 
     <view class="bottom-safe"></view>
   </view>
-
 </view>

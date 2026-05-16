@@ -1,6 +1,4 @@
 <view class="page-wrap">
-
-  <!-- ─── 顶部 Tab 导航（下划线风格） ─── -->
   <view class="tab-bar">
     <scroll-view scroll-x class="tab-scroll" scroll-with-animation>
       <view class="tab-inner">
@@ -19,8 +17,21 @@
     </scroll-view>
   </view>
 
-  <!-- ─── 分类说明 ─── -->
-  <view class="cat-header">
+  <view class="search-wrap">
+    <view class="search-bar">
+      <image class="search-icon" src="/assets/icons/search.svg" mode="aspectFit"></image>
+      <input
+        class="search-input"
+        value="{{keyword}}"
+        placeholder="搜索：旅行 / 搬家 / 待产 / 面试"
+        placeholder-class="search-placeholder"
+        bindinput="onSearchInput"
+        confirm-type="search"
+      />
+    </view>
+  </view>
+
+  <view wx:if="{{!keyword}}" class="cat-header">
     <view class="cat-header-icon">{{activeCategoryInfo.icon}}</view>
     <view class="cat-header-info">
       <view class="cat-header-name">{{activeCategoryInfo.name}}</view>
@@ -28,14 +39,39 @@
     </view>
   </view>
 
-  <!-- ─── 清单列表 ─── -->
   <view class="container">
-    <view wx:if="{{templates.length === 0}}" class="empty-wrap">
-      <view class="empty-icon">📂</view>
+    <view wx:if="{{keyword}}" class="search-title">搜索结果</view>
+
+    <view wx:if="{{keyword && searchResults.length === 0}}" class="empty-wrap">
+      <image class="empty-icon" src="/assets/icons/empty.svg" mode="aspectFit"></image>
+      <view class="empty-text">没有找到相关清单</view>
+    </view>
+
+    <view class="cell-group" wx:if="{{keyword && searchResults.length > 0}}">
+      <view
+        wx:for="{{searchResults}}"
+        wx:key="id"
+        class="list-cell"
+        data-id="{{item.id}}"
+        bindtap="goChecklist"
+        hover-class="cell-hover"
+      >
+        <view class="cell-icon">{{item.icon}}</view>
+        <view class="cell-body">
+          <view class="cell-title">{{item.title}}</view>
+          <view class="cell-desc">{{item.description}}</view>
+          <view class="tag">搜索结果</view>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+    </view>
+
+    <view wx:if="{{!keyword && templates.length === 0}}" class="empty-wrap">
+      <image class="empty-icon" src="/assets/icons/folder.svg" mode="aspectFit"></image>
       <view class="empty-text">该分类暂无清单</view>
     </view>
 
-    <view class="cell-group" wx:if="{{templates.length > 0}}">
+    <view class="cell-group" wx:if="{{!keyword && templates.length > 0}}">
       <view
         wx:for="{{templates}}"
         wx:key="id"
@@ -56,5 +92,4 @@
 
     <view class="bottom-safe"></view>
   </view>
-
 </view>

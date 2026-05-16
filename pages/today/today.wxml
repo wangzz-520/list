@@ -1,0 +1,80 @@
+<view class="page-wrap">
+  <view class="hero">
+    <view class="hero-kicker">{{todayKey}}</view>
+    <view class="hero-title">今日要做</view>
+    <view class="hero-sub">聚合进行中的清单、常用清单和今日完成记录。</view>
+  </view>
+
+  <view class="container">
+    <view class="section-row">
+      <view class="section-title">进行中的清单</view>
+    </view>
+    <view wx:if="{{pendingLists.length === 0}}" class="empty-card">
+      <image class="empty-icon" src="/assets/icons/empty.svg" mode="aspectFit"></image>
+      <view class="empty-text">{{emptyText}}</view>
+    </view>
+    <view wx:if="{{pendingLists.length > 0}}" class="cell-group">
+      <view
+        wx:for="{{pendingLists}}"
+        wx:key="id"
+        class="list-cell"
+        data-id="{{item.id}}"
+        bindtap="goChecklist"
+        hover-class="cell-hover"
+      >
+        <view class="cell-icon">{{item.icon}}</view>
+        <view class="cell-body">
+          <view class="cell-title">{{item.title}}</view>
+          <view class="cell-desc">{{item.description}}</view>
+          <view class="progress-track">
+            <view class="progress-fill" style="width: {{item.progress.percent}}%;"></view>
+          </view>
+        </view>
+        <view class="cell-tag">{{item.tag}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{pinnedLists.length > 0}}">
+      <view class="section-title standalone">常用清单</view>
+      <view class="quick-grid">
+        <view
+          wx:for="{{pinnedLists}}"
+          wx:key="id"
+          class="quick-card"
+          data-id="{{item.id}}"
+          bindtap="goChecklist"
+          hover-class="cell-hover"
+        >
+          <view class="quick-icon">{{item.icon}}</view>
+          <view class="quick-title">{{item.title}}</view>
+          <view class="quick-tag">{{item.tag}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-title standalone">今日完成</view>
+    <view wx:if="{{completedToday.length === 0}}" class="empty-card compact">
+      <view class="empty-text">完成一张清单后会自动出现在这里</view>
+    </view>
+    <view wx:if="{{completedToday.length > 0}}" class="cell-group">
+      <view
+        wx:for="{{completedToday}}"
+        wx:key="id"
+        class="completed-cell"
+        data-id="{{item.id}}"
+        data-share-id="{{item.shareId}}"
+        bindtap="goChecklist"
+        hover-class="cell-hover"
+      >
+        <view class="cell-icon done">{{item.icon}}</view>
+        <view class="cell-body">
+          <view class="cell-title">{{item.title}}</view>
+          <view class="cell-desc">已完成 {{item.progress.done || item.progress.total || 0}} 项</view>
+        </view>
+        <text class="done-mark">✓</text>
+      </view>
+    </view>
+
+    <view class="bottom-safe"></view>
+  </view>
+</view>

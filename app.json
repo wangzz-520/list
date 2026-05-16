@@ -3,22 +3,21 @@
     "pages/index/index",
     "pages/category/category",
     "pages/checklist/checklist",
-    "pages/custom/custom",
-    "pages/challenge/challenge",
+    "pages/today/today",
     "pages/decision/decision",
     "pages/mine/mine"
   ],
   "window": {
     "navigationBarTitleText": "生活清单",
-    "navigationBarBackgroundColor": "#07C160",
+    "navigationBarBackgroundColor": "#2f6fed",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#F5F5F5",
+    "backgroundColor": "#f4f7fc",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#AAAAAA",
-    "selectedColor": "#07C160",
-    "backgroundColor": "#FFFFFF",
+    "color": "#7a8499",
+    "selectedColor": "#2f6fed",
+    "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
       {
@@ -32,12 +31,6 @@
         "text": "分类",
         "iconPath": "assets/tabbar/category-normal.png",
         "selectedIconPath": "assets/tabbar/category-selected.png"
-      },
-      {
-        "pagePath": "pages/custom/custom",
-        "text": "新建",
-        "iconPath": "assets/tabbar/custom-normal.png",
-        "selectedIconPath": "assets/tabbar/custom-selected.png"
       },
       {
         "pagePath": "pages/mine/mine",

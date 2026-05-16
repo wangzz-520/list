@@ -14,16 +14,37 @@ function cleanOptions(options) {
     .slice(0, 20);
 }
 
+function buildChecklistItems(options) {
+  return options.map((text, index) => ({
+    id: `item_${Date.now()}_${index}_${Math.floor(Math.random() * 1000)}`,
+    text,
+    custom: true
+  }));
+}
+
 Page({
   data: {
     title: '',
     options: [createOption(), createOption()],
     result: '',
+    excludeLastResult: false,
     history: [],
     quickSets: [
-      { name: '今天吃什么', options: ['米饭套餐', '面条', '轻食', '自己做饭'] },
-      { name: '周末安排', options: ['在家整理', '出门走走', '看电影', '见朋友'] },
-      { name: '先做哪件事', options: ['最紧急的', '最简单的', '最耗时的', '最想拖的'] }
+      {
+        name: '吃什么',
+        title: '今天吃什么',
+        options: ['米饭套餐', '面条/粉', '轻食沙拉', '火锅/麻辣烫', '自己做饭', '外卖随便点']
+      },
+      {
+        name: '去哪玩',
+        title: '今天去哪玩',
+        options: ['公园散步', '商场逛逛', '看电影', '咖啡馆坐坐', '近郊短途', '在家休息']
+      },
+      {
+        name: '先做哪件事',
+        title: '先做哪件事',
+        options: ['先做最重要的', '先做最简单的', '先做最耗时的', '先处理最拖延的', '先做能立刻完成的']
+      }
     ]
   },
 
@@ -47,6 +68,10 @@ Page({
       text: event.detail.value
     };
     this.setData({ options, result: '' });
+  },
+
+  onExcludeChange(event) {
+    this.setData({ excludeLastResult: Boolean(event.detail.value) });
   },
 
   addOption() {
@@ -76,7 +101,7 @@ Page({
     const preset = this.data.quickSets[index];
     if (!preset) return;
     this.setData({
-      title: preset.name,
+      title: preset.title,
       options: preset.options.map(text => createOption(text)),
       result: ''
     });
@@ -88,11 +113,48 @@ Page({
       wx.showToast({ title: '请至少填写 2 个选项', icon: 'none' });
       return;
     }
-    const result = options[Math.floor(Math.random() * options.length)];
+
+    const lastResult = this.data.result || (this.data.history[0] && this.data.history[0].result);
+    const candidates = this.data.excludeLastResult && lastResult
+      ? options.filter(text => text !== lastResult)
+      : options;
+    const pool = candidates.length > 0 ? candidates : options;
+    const result = pool[Math.floor(Math.random() * pool.length)];
     const title = String(this.data.title || '').trim() || '临时选择';
+
     storage.addDecisionHistory({ title, result, options });
     this.setData({ result });
     this.refreshHistory();
+  },
+
+  saveAsChecklist() {
+    const options = cleanOptions(this.data.options);
+    if (options.length < 1) {
+      wx.showToast({ title: '请先填写选项', icon: 'none' });
+      return;
+    }
+
+    const title = String(this.data.title || '').trim() || '选择清单';
+    const id = `custom_${Date.now()}`;
+    storage.saveCustomList({
+      id,
+      title: title.includes('清单') ? title : `${title}选择清单`,
+      icon: '🎲',
+      category: 'custom',
+      description: '从选择困难症助手保存的候选清单，可继续勾选和复用。',
+      groups: [
+        {
+          id: 'decision_options',
+          name: '候选选项',
+          items: buildChecklistItems(options)
+        }
+      ]
+    });
+
+    wx.showToast({ title: '已保存', icon: 'success' });
+    setTimeout(() => {
+      wx.navigateTo({ url: `/pages/checklist/checklist?id=${id}` });
+    }, 350);
   },
 
   resetOptions() {

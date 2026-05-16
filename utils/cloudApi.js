@@ -51,11 +51,20 @@ async function createShareList(payload = {}) {
   return callFunction('createShareList', payload);
 }
 
+async function getShareList(shareId) {
+  const id = String(shareId || '').trim();
+  if (!id) return null;
+  const result = await callFunction('createShareList', { operation: 'get', shareId: id });
+  if (!result || result.ok === false) return null;
+  return result.data || null;
+}
+
 module.exports = {
   isCloudReady,
   callFunction,
   getTemplates,
   getTemplateById,
   submitFeedback,
-  createShareList
+  createShareList,
+  getShareList
 };

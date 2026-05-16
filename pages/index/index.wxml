@@ -1,132 +1,85 @@
 <view class="page-wrap">
-  <!-- ─── 顶部横幅 ─── -->
   <view class="banner">
-    <view class="banner-left">
-      <view class="banner-title">万能生活清单</view>
-      <view class="banner-sub">旅行 · 搬家 · 待产 · 开学 · 老人就医</view>
-      <button class="banner-btn" bindtap="goCustom">＋ 新建清单</button>
+    <view class="brand-row">
+      <image class="banner-logo" src="/assets/icons/logo.svg" mode="aspectFit"></image>
+      <view class="brand-text">
+        <view class="brand-name">万能生活清单</view>
+        <view class="brand-desc">本地优先 · 云端同步</view>
+      </view>
     </view>
-    <view class="banner-emoji">📋</view>
+    <view class="banner-title">生活清单，一项项不漏</view>
+    <view class="banner-sub">查看清单、场景模板、选择助手，都从这里开始。</view>
   </view>
 
-  <!-- ─── 主内容区（上拉卡片效果） ─── -->
   <view class="main-content">
-
-    <!-- 搜索框 -->
-    <view class="search-bar">
-      <text class="search-icon">🔍</text>
-      <input
-        class="search-input"
-        value="{{keyword}}"
-        placeholder="搜索：旅行 / 搬家 / 待产 / 面试"
-        placeholder-class="search-placeholder"
-        bindinput="onSearchInput"
-        confirm-type="search"
-      />
-    </view>
-
-    <!-- ─── 搜索结果 ─── -->
-    <view wx:if="{{keyword}}">
-      <view class="section-title">搜索结果</view>
-      <view wx:if="{{searchResults.length === 0}}" class="empty-wrap">
-        <view class="empty-icon">🔎</view>
-        <view class="empty-text">没有找到相关清单</view>
-      </view>
-      <view class="cell-group" wx:if="{{searchResults.length > 0}}">
-        <view
-          wx:for="{{searchResults}}"
-          wx:key="id"
-          class="list-cell"
-          data-id="{{item.id}}"
-          bindtap="goChecklist"
-          hover-class="cell-hover"
-        >
-          <view class="cell-icon">{{item.icon}}</view>
-          <view class="cell-body">
-            <view class="cell-title">{{item.title}}</view>
-            <view class="cell-desc">{{item.description}}</view>
-          </view>
-          <text class="cell-arrow">›</text>
+    <view>
+      <view class="action-grid">
+        <view class="action-card primary" bindtap="goMine" hover-class="cell-hover">
+          <image class="action-icon" src="/assets/icons/folder.svg" mode="aspectFit"></image>
+          <view class="action-title">查看清单</view>
+          <view class="action-desc">我的清单和最近完成</view>
         </view>
-      </view>
-    </view>
-
-    <!-- ─── 默认内容 ─── -->
-    <view wx:else>
-
-      <view class="challenge-card" bindtap="goChallenge" hover-class="cell-hover">
-        <view class="challenge-icon">{{challenge.todayChecked ? '✅' : '🔥'}}</view>
-        <view class="challenge-body">
-          <view class="challenge-title">{{challenge.todayChecked ? '今日已完成打卡' : '每日打卡挑战'}}</view>
-          <view class="challenge-desc">连续 {{challenge.streak || 0}} 天 · 累计 {{challenge.total || 0}} 天</view>
-        </view>
-        <text class="cell-arrow">›</text>
-      </view>
-
-      <view class="tool-card" bindtap="goDecision" hover-class="cell-hover">
-        <view class="tool-icon">🎲</view>
-        <view class="tool-body">
-          <view class="tool-title">选择困难症助手</view>
-          <view class="tool-desc">输入几个选项，帮你快速定下来</view>
-        </view>
-        <text class="cell-arrow">›</text>
-      </view>
-
-      <!-- 热门分类 -->
-      <view class="section-title">热门分类</view>
-      <view class="cat-grid">
-        <view
-          wx:for="{{categories}}"
-          wx:key="id"
-          class="cat-item"
-          data-id="{{item.id}}"
-          bindtap="goCategory"
-          hover-class="cat-hover"
-        >
-          <view class="cat-icon">{{item.icon}}</view>
-          <view class="cat-name">{{item.name}}</view>
+        <view class="action-card" bindtap="goDecision" hover-class="cell-hover">
+          <image class="action-icon" src="/assets/icons/dice.svg" mode="aspectFit"></image>
+          <view class="action-title">选择助手</view>
+          <view class="action-desc">吃什么、去哪玩</view>
         </view>
       </view>
 
-      <!-- 热门清单 -->
-      <view class="section-title">热门清单</view>
-      <view class="cell-group">
-        <view
-          wx:for="{{popularTemplates}}"
-          wx:key="id"
-          class="list-cell"
-          data-id="{{item.id}}"
-          bindtap="goChecklist"
-          hover-class="cell-hover"
-        >
-          <view class="cell-icon">{{item.icon}}</view>
-          <view class="cell-body">
-            <view class="cell-title">{{item.title}}</view>
-            <view class="cell-desc">{{item.description}}</view>
-            <view class="tag">热度 {{item.heat}}</view>
-          </view>
-          <text class="cell-arrow">›</text>
-        </view>
-      </view>
-
-      <!-- 最近使用 -->
-      <view wx:if="{{recents.length > 0}}">
-        <view class="section-title">最近使用</view>
-        <view class="recent-row">
+      <view wx:if="{{pinnedTemplates.length > 0}}">
+        <view class="section-title">常用清单</view>
+        <view class="pinned-row">
           <view
-            wx:for="{{recents}}"
+            wx:for="{{pinnedTemplates}}"
             wx:key="id"
-            class="recent-card"
+            class="pinned-card"
             data-id="{{item.id}}"
             bindtap="goChecklist"
-            hover-class="recent-hover"
+            hover-class="cell-hover"
           >
-            <view class="recent-icon">{{item.icon}}</view>
-            <text class="recent-name">{{item.title}}</text>
+            <view class="pinned-icon">{{item.icon}}</view>
+            <view class="pinned-title">{{item.title}}</view>
           </view>
         </view>
       </view>
 
+      <view class="section-row">
+        <view class="section-title">精选模板</view>
+      </view>
+
+      <view class="template-section-list">
+        <view wx:for="{{templateSections}}" wx:key="id" class="template-section">
+          <view class="template-section-head">
+            <view class="template-section-main">
+              <view class="template-section-icon">{{item.icon}}</view>
+              <view class="template-section-copy">
+                <view class="template-section-title">{{item.name}}</view>
+                <view class="template-section-desc">{{item.desc}}</view>
+              </view>
+            </view>
+          </view>
+
+          <view
+            wx:for="{{item.templates}}"
+            wx:for-item="tpl"
+            wx:key="id"
+            class="template-mini"
+            data-id="{{tpl.id}}"
+            bindtap="goChecklist"
+            hover-class="cell-hover"
+          >
+            <view class="template-mini-icon">{{tpl.icon}}</view>
+            <view class="template-mini-body">
+              <view class="template-mini-top">
+                <view class="template-mini-title">{{tpl.title}}</view>
+                <view class="template-mini-heat">热度 {{tpl.heat}}</view>
+              </view>
+              <view class="template-mini-desc">{{tpl.description}}</view>
+            </view>
+            <text class="cell-arrow">›</text>
+          </view>
+        </view>
+      </view>
     </view>
 
     <view class="bottom-safe"></view>

@@ -8,7 +8,9 @@ function normalizePayload(payload = {}) {
     schemaVersion: 1,
     drafts: payload.drafts || {},
     favorites: Array.isArray(payload.favorites) ? payload.favorites.slice(0, 300) : [],
+    pinnedTemplates: Array.isArray(payload.pinnedTemplates) ? payload.pinnedTemplates.slice(0, 20) : [],
     recents: Array.isArray(payload.recents) ? payload.recents.slice(0, 30) : [],
+    completedLists: Array.isArray(payload.completedLists) ? payload.completedLists.slice(0, 50) : [],
     customLists: Array.isArray(payload.customLists) ? payload.customLists.slice(0, 200) : [],
     feedbacks: Array.isArray(payload.feedbacks) ? payload.feedbacks.slice(0, 50) : [],
     clientExportedAt: Number(payload.exportedAt || Date.now())

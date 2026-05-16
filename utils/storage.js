@@ -3,9 +3,10 @@ const cloudConfig = require('../config/cloud');
 const KEYS = {
   DRAFTS: 'life_checklist_v1_drafts',
   FAVORITES: 'life_checklist_v1_favorites',
+  PINNED_TEMPLATES: 'life_checklist_v1_pinned_templates',
   RECENTS: 'life_checklist_v1_recents',
+  COMPLETED_LISTS: 'life_checklist_v1_completed_lists',
   CUSTOM_LISTS: 'life_checklist_v1_custom_lists',
-  DAILY_CHALLENGE: 'life_checklist_v1_daily_challenge',
   DECISION_HISTORY: 'life_checklist_v1_decision_history',
   FEEDBACKS: 'life_checklist_v1_feedbacks',
   LAST_CLOUD_SYNC_AT: 'life_checklist_v1_last_cloud_sync_at'
@@ -82,6 +83,10 @@ function getDraft(listId) {
   return drafts[listId] || { checkedMap: {}, deletedIds: [], extraItemsByGroup: {} };
 }
 
+function getDrafts() {
+  return read(KEYS.DRAFTS, {});
+}
+
 function saveDraft(listId, draft) {
   const drafts = read(KEYS.DRAFTS, {});
   drafts[listId] = {
@@ -117,6 +122,26 @@ function toggleFavorite(id) {
   return favorites.includes(id);
 }
 
+function getPinnedTemplates() {
+  return read(KEYS.PINNED_TEMPLATES, []);
+}
+
+function isPinnedTemplate(id) {
+  return getPinnedTemplates().includes(id);
+}
+
+function togglePinnedTemplate(id) {
+  const pinned = getPinnedTemplates();
+  const index = pinned.indexOf(id);
+  if (index >= 0) {
+    pinned.splice(index, 1);
+  } else {
+    pinned.unshift(id);
+  }
+  write(KEYS.PINNED_TEMPLATES, pinned.slice(0, 20));
+  return pinned.includes(id);
+}
+
 function addRecent(item) {
   const recents = read(KEYS.RECENTS, []);
   const next = recents.filter(row => row.id !== item.id);
@@ -126,6 +151,27 @@ function addRecent(item) {
 
 function getRecents() {
   return read(KEYS.RECENTS, []);
+}
+
+function getCompletedLists() {
+  return read(KEYS.COMPLETED_LISTS, []);
+}
+
+function markListCompleted(item) {
+  const completed = getCompletedLists();
+  const today = getTodayKey();
+  const next = completed.filter(row => !(row.id === item.id && row.completedDate === today));
+  next.unshift({
+    id: item.id,
+    shareId: item.shareId || '',
+    title: item.title,
+    icon: item.icon || '✅',
+    completedAt: Date.now(),
+    completedDate: today,
+    progress: item.progress || { total: 0, done: 0, percent: 100 }
+  });
+  write(KEYS.COMPLETED_LISTS, next.slice(0, 50));
+  return next[0];
 }
 
 function getCustomLists() {
@@ -155,7 +201,9 @@ function saveCustomList(list) {
 
 function removeCustomList(id) {
   const lists = getCustomLists().filter(item => item.id !== id);
+  const completed = getCompletedLists().filter(item => item.id !== id);
   clearDraft(id);
+  write(KEYS.COMPLETED_LISTS, completed);
   return write(KEYS.CUSTOM_LISTS, lists);
 }
 
@@ -169,6 +217,10 @@ function getFeedbacks() {
   return read(KEYS.FEEDBACKS, []);
 }
 
+function getLastCloudSyncAt() {
+  return read(KEYS.LAST_CLOUD_SYNC_AT, 0);
+}
+
 function formatDate(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -178,66 +230,6 @@ function formatDate(date) {
 
 function getTodayKey() {
   return formatDate(new Date());
-}
-
-function getYesterdayKey() {
-  const date = new Date();
-  date.setDate(date.getDate() - 1);
-  return formatDate(date);
-}
-
-function getDailyChallenge() {
-  const data = read(KEYS.DAILY_CHALLENGE, {});
-  const checkedDates = data.checkedDates || {};
-  return {
-    checkedDates,
-    lastCheckedDate: data.lastCheckedDate || '',
-    streak: Number(data.streak || 0),
-    total: Number(data.total || Object.keys(checkedDates).length || 0),
-    updatedAt: data.updatedAt || 0
-  };
-}
-
-function isTodayChecked() {
-  const challenge = getDailyChallenge();
-  return !!challenge.checkedDates[getTodayKey()];
-}
-
-function checkInToday() {
-  const today = getTodayKey();
-  const yesterday = getYesterdayKey();
-  const challenge = getDailyChallenge();
-
-  if (challenge.checkedDates[today]) {
-    return { ...challenge, todayChecked: true };
-  }
-
-  const checkedDates = {
-    ...challenge.checkedDates,
-    [today]: Date.now()
-  };
-  const streak = challenge.lastCheckedDate === yesterday ? challenge.streak + 1 : 1;
-  const next = {
-    checkedDates,
-    lastCheckedDate: today,
-    streak,
-    total: Object.keys(checkedDates).length,
-    updatedAt: Date.now()
-  };
-  write(KEYS.DAILY_CHALLENGE, next);
-  return { ...next, todayChecked: true };
-}
-
-function resetDailyChallenge() {
-  const empty = {
-    checkedDates: {},
-    lastCheckedDate: '',
-    streak: 0,
-    total: 0,
-    updatedAt: Date.now()
-  };
-  write(KEYS.DAILY_CHALLENGE, empty);
-  return empty;
 }
 
 function getDecisionHistory() {
@@ -265,11 +257,13 @@ function clearDecisionHistory() {
 function clearAllUserData() {
   write(KEYS.DRAFTS, {});
   write(KEYS.FAVORITES, []);
+  write(KEYS.PINNED_TEMPLATES, []);
   write(KEYS.RECENTS, []);
+  write(KEYS.COMPLETED_LISTS, []);
   write(KEYS.CUSTOM_LISTS, []);
-  write(KEYS.DAILY_CHALLENGE, {});
   write(KEYS.DECISION_HISTORY, []);
   write(KEYS.FEEDBACKS, []);
+  write(KEYS.LAST_CLOUD_SYNC_AT, 0, { silent: true });
 }
 
 function exportUserData() {
@@ -277,7 +271,9 @@ function exportUserData() {
     schemaVersion: 1,
     drafts: read(KEYS.DRAFTS, {}),
     favorites: read(KEYS.FAVORITES, []),
+    pinnedTemplates: read(KEYS.PINNED_TEMPLATES, []),
     recents: read(KEYS.RECENTS, []),
+    completedLists: read(KEYS.COMPLETED_LISTS, []),
     customLists: read(KEYS.CUSTOM_LISTS, []),
     feedbacks: read(KEYS.FEEDBACKS, []),
     exportedAt: Date.now()
@@ -298,6 +294,21 @@ function mergeArrayById(localRows, cloudRows, limit) {
     .slice(0, limit || 1000);
 }
 
+function mergeCompletedLists(localRows, cloudRows, limit) {
+  const map = {};
+  (cloudRows || []).concat(localRows || []).forEach(row => {
+    if (!row || !row.id) return;
+    const key = `${row.id}_${row.completedDate || ''}`;
+    const existed = map[key];
+    if (!existed || Number(row.completedAt || 0) >= Number(existed.completedAt || 0)) {
+      map[key] = row;
+    }
+  });
+  return Object.values(map)
+    .sort((a, b) => Number(b.completedAt || 0) - Number(a.completedAt || 0))
+    .slice(0, limit || 50);
+}
+
 function mergeDrafts(localDrafts, cloudDrafts) {
   return {
     ...(cloudDrafts || {}),
@@ -308,14 +319,18 @@ function mergeDrafts(localDrafts, cloudDrafts) {
 function importUserData(cloudData = {}) {
   const local = exportUserData();
   const favorites = Array.from(new Set([...(cloudData.favorites || []), ...(local.favorites || [])]));
+  const pinnedTemplates = Array.from(new Set([...(cloudData.pinnedTemplates || []), ...(local.pinnedTemplates || [])])).slice(0, 20);
   const recents = mergeArrayById(local.recents, cloudData.recents, 12);
+  const completedLists = mergeCompletedLists(local.completedLists, cloudData.completedLists, 50);
   const customLists = mergeArrayById(local.customLists, cloudData.customLists, 100);
   const feedbacks = mergeArrayById(local.feedbacks, cloudData.feedbacks, 30);
   const drafts = mergeDrafts(local.drafts, cloudData.drafts);
 
   write(KEYS.DRAFTS, drafts, { silent: true });
   write(KEYS.FAVORITES, favorites, { silent: true });
+  write(KEYS.PINNED_TEMPLATES, pinnedTemplates, { silent: true });
   write(KEYS.RECENTS, recents, { silent: true });
+  write(KEYS.COMPLETED_LISTS, completedLists, { silent: true });
   write(KEYS.CUSTOM_LISTS, customLists, { silent: true });
   write(KEYS.FEEDBACKS, feedbacks, { silent: true });
   write(KEYS.LAST_CLOUD_SYNC_AT, Date.now(), { silent: true });
@@ -326,24 +341,27 @@ function importUserData(cloudData = {}) {
 module.exports = {
   KEYS,
   getDraft,
+  getDrafts,
   saveDraft,
   clearDraft,
   getFavorites,
   isFavorite,
   toggleFavorite,
+  getPinnedTemplates,
+  isPinnedTemplate,
+  togglePinnedTemplate,
   addRecent,
   getRecents,
+  getCompletedLists,
+  markListCompleted,
   getCustomLists,
   getCustomList,
   saveCustomList,
   removeCustomList,
   addFeedback,
   getFeedbacks,
+  getLastCloudSyncAt,
   getTodayKey,
-  getDailyChallenge,
-  isTodayChecked,
-  checkInToday,
-  resetDailyChallenge,
   getDecisionHistory,
   addDecisionHistory,
   clearDecisionHistory,

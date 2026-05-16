@@ -48,7 +48,7 @@
     "ignoreDevUnusedFiles": false
   },
   "compileType": "miniprogram",
-  "libVersion": "latest",
+  "libVersion": "3.15.2",
   "appid": "wx95e317642a745b59",
   "projectname": "life-checklist-assistant",
   "miniprogramRoot": "./",
