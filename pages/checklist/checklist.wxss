@@ -1,0 +1,291 @@
+.page-wrap {
+  min-height: 100vh;
+  background: #f6f8fb;
+}
+
+.top-card {
+  padding: 32rpx 30rpx 30rpx;
+  background: #ffffff;
+  border-bottom: 1rpx solid #e8edf6;
+}
+
+.title-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.big-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 94rpx;
+  height: 94rpx;
+  margin-right: 22rpx;
+  font-size: 50rpx;
+  background: #edf4ff;
+  border-radius: 16rpx;
+}
+
+.title-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.checklist-title {
+  color: #172033;
+  font-size: 36rpx;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.checklist-desc {
+  margin-top: 8rpx;
+  color: #75839a;
+  font-size: 25rpx;
+  line-height: 1.55;
+}
+
+.progress-wrap {
+  margin-top: 30rpx;
+}
+
+.progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14rpx;
+}
+
+.progress-label {
+  color: #4d5f7a;
+  font-size: 25rpx;
+  font-weight: 700;
+}
+
+.progress-num {
+  color: #2f6fed;
+  font-size: 25rpx;
+  font-weight: 800;
+}
+
+.progress-track {
+  height: 14rpx;
+  overflow: hidden;
+  background: #e9eef7;
+  border-radius: 999rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2f6fed, #68a1ff);
+  border-radius: 999rpx;
+}
+
+.progress-pct {
+  margin-top: 8rpx;
+  color: #8793a8;
+  font-size: 22rpx;
+  text-align: right;
+}
+
+.action-row {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 26rpx;
+}
+
+.action-btn-ghost {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  height: 78rpx;
+  color: #4d5f7a;
+  font-size: 27rpx;
+  font-weight: 700;
+  line-height: 78rpx;
+  background: #f3f6fb;
+  border: none;
+  border-radius: 12rpx;
+}
+
+.action-btn-ghost text + text {
+  margin-left: 8rpx;
+}
+
+.action-btn-ghost::after {
+  border: none;
+}
+
+.container {
+  padding: 22rpx 24rpx 0;
+}
+
+.add-card {
+  padding: 24rpx;
+  margin-bottom: 22rpx;
+  background: #ffffff;
+  border: 1rpx solid #e8edf6;
+  border-radius: 16rpx;
+}
+
+.add-label {
+  margin-bottom: 16rpx;
+  color: #4d5f7a;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.add-row {
+  display: flex;
+  gap: 14rpx;
+  align-items: center;
+}
+
+.add-input {
+  flex: 1;
+  min-width: 0;
+  height: 80rpx;
+  padding: 0 22rpx;
+  color: #172033;
+  font-size: 27rpx;
+  background: #f3f6fb;
+  border-radius: 12rpx;
+}
+
+.input-placeholder {
+  color: #a3afc2;
+}
+
+.add-submit {
+  flex-shrink: 0;
+  width: 124rpx;
+  height: 80rpx;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 800;
+  line-height: 80rpx;
+  background: #2f6fed;
+  border: none;
+  border-radius: 12rpx;
+}
+
+.add-submit::after {
+  border: none;
+}
+
+.group-wrap {
+  margin-bottom: 22rpx;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8rpx 14rpx;
+}
+
+.group-name {
+  color: #4d5f7a;
+  font-size: 27rpx;
+  font-weight: 800;
+}
+
+.group-count {
+  color: #8793a8;
+  font-size: 23rpx;
+}
+
+.group-empty {
+  padding: 42rpx 24rpx;
+  color: #8793a8;
+  font-size: 26rpx;
+  text-align: center;
+  background: #ffffff;
+  border: 1rpx solid #e8edf6;
+  border-radius: 16rpx;
+}
+
+.cell-group {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1rpx solid #e8edf6;
+  border-radius: 16rpx;
+}
+
+.task-cell {
+  display: flex;
+  align-items: center;
+  min-height: 92rpx;
+  padding: 22rpx 24rpx;
+  border-bottom: 1rpx solid #edf1f7;
+}
+
+.task-cell:last-child {
+  border-bottom: none;
+}
+
+.task-hover {
+  background: #f2f6ff;
+}
+
+.task-done {
+  background: #fbfcff;
+}
+
+.checkbox {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 46rpx;
+  height: 46rpx;
+  margin-right: 20rpx;
+  color: #ffffff;
+  border: 3rpx solid #bdc8da;
+  border-radius: 50%;
+}
+
+.checkbox.checked {
+  background: #2f6fed;
+  border-color: #2f6fed;
+}
+
+.check-mark {
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.task-text {
+  flex: 1;
+  min-width: 0;
+  color: #172033;
+  font-size: 29rpx;
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+.text-done {
+  color: #9aa6b8;
+  text-decoration: line-through;
+}
+
+.task-delete {
+  flex-shrink: 0;
+  padding-left: 18rpx;
+  color: #d93f3f;
+  font-size: 24rpx;
+}
+
+.bottom-actions {
+  margin-top: 34rpx;
+}
+
+.bottom-actions .danger-btn {
+  width: 100%;
+}
+
+.bottom-safe {
+  height: 56rpx;
+}

@@ -1,0 +1,60 @@
+<view class="page-wrap">
+
+  <!-- ─── 顶部 Tab 导航（下划线风格） ─── -->
+  <view class="tab-bar">
+    <scroll-view scroll-x class="tab-scroll" scroll-with-animation>
+      <view class="tab-inner">
+        <view
+          wx:for="{{categories}}"
+          wx:key="id"
+          class="tab-item {{activeCategory === item.id ? 'active' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="selectCategory"
+        >
+          <text class="tab-icon">{{item.icon}}</text>
+          <text class="tab-text">{{item.name}}</text>
+          <view class="tab-line" wx:if="{{activeCategory === item.id}}"></view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- ─── 分类说明 ─── -->
+  <view class="cat-header">
+    <view class="cat-header-icon">{{activeCategoryInfo.icon}}</view>
+    <view class="cat-header-info">
+      <view class="cat-header-name">{{activeCategoryInfo.name}}</view>
+      <view class="cat-header-desc">{{activeCategoryInfo.desc}}</view>
+    </view>
+  </view>
+
+  <!-- ─── 清单列表 ─── -->
+  <view class="container">
+    <view wx:if="{{templates.length === 0}}" class="empty-wrap">
+      <view class="empty-icon">📂</view>
+      <view class="empty-text">该分类暂无清单</view>
+    </view>
+
+    <view class="cell-group" wx:if="{{templates.length > 0}}">
+      <view
+        wx:for="{{templates}}"
+        wx:key="id"
+        class="list-cell"
+        data-id="{{item.id}}"
+        bindtap="goChecklist"
+        hover-class="cell-hover"
+      >
+        <view class="cell-icon">{{item.icon}}</view>
+        <view class="cell-body">
+          <view class="cell-title">{{item.title}}</view>
+          <view class="cell-desc">{{item.description}}</view>
+          <view class="tag">{{activeCategoryInfo.name}}</view>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="bottom-safe"></view>
+  </view>
+
+</view>

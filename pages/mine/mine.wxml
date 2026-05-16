@@ -1,0 +1,120 @@
+<view class="page-wrap">
+
+  <!-- ─── 个人信息头部 ─── -->
+  <view class="profile-header">
+    <view class="avatar-wrap">
+      <view class="avatar">✅</view>
+    </view>
+    <view class="profile-name">万能生活清单</view>
+    <view class="profile-sub">本地优先 · 支持微信云同步</view>
+  </view>
+
+  <!-- ─── 主内容 ─── -->
+  <view class="main-content">
+
+    <!-- 我的收藏 -->
+    <view class="group-title">我的收藏</view>
+    <view wx:if="{{favoriteTemplates.length === 0}}" class="empty-card">
+      <view class="empty-icon">🤍</view>
+      <view class="empty-text">暂无收藏，打开清单后可以收藏</view>
+    </view>
+    <view class="cell-group" wx:if="{{favoriteTemplates.length > 0}}">
+      <view
+        wx:for="{{favoriteTemplates}}"
+        wx:key="id"
+        class="list-cell"
+        data-id="{{item.id}}"
+        bindtap="goChecklist"
+        hover-class="cell-hover"
+      >
+        <view class="cell-icon">{{item.icon}}</view>
+        <view class="cell-body">
+          <view class="cell-title">{{item.title}}</view>
+          <view class="cell-desc">{{item.description}}</view>
+        </view>
+        <text class="cell-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 我的自定义清单 -->
+    <view class="group-title">我的清单</view>
+    <view wx:if="{{customLists.length === 0}}" class="empty-card">
+      <view class="empty-icon">📝</view>
+      <view class="empty-text">暂无自定义清单，去「新建」创建一个</view>
+    </view>
+    <view class="cell-group" wx:if="{{customLists.length > 0}}">
+      <view wx:for="{{customLists}}" wx:key="id" class="list-cell">
+        <view class="cell-icon-wrap" data-id="{{item.id}}" bindtap="goChecklist">
+          <view class="cell-icon">{{item.icon}}</view>
+        </view>
+        <view class="cell-body" data-id="{{item.id}}" bindtap="goChecklist">
+          <view class="cell-title">{{item.title}}</view>
+          <view class="cell-desc">{{item.description}}</view>
+        </view>
+        <view class="cell-delete" data-id="{{item.id}}" bindtap="removeCustom">删除</view>
+      </view>
+    </view>
+
+    <!-- 云端同步 -->
+    <view class="group-title">数据管理</view>
+    <view class="settings-group">
+      <view class="settings-cell" bindtap="goChallenge">
+        <view class="settings-left">
+          <view class="settings-icon">🔥</view>
+          <view class="settings-info">
+            <view class="settings-name">每日打卡挑战</view>
+            <view class="settings-sub">{{challenge.todayChecked ? '今日已完成' : '今日待打卡'}} · 连续 {{challenge.streak || 0}} 天</view>
+          </view>
+        </view>
+        <text class="settings-arrow">›</text>
+      </view>
+      <view class="cell-divider"></view>
+      <view class="settings-cell" bindtap="goDecision">
+        <view class="settings-left">
+          <view class="settings-icon">🎲</view>
+          <view class="settings-info">
+            <view class="settings-name">选择困难症助手</view>
+            <view class="settings-sub">几个选项犹豫不决时，帮你快速选一个</view>
+          </view>
+        </view>
+        <text class="settings-arrow">›</text>
+      </view>
+      <view class="cell-divider"></view>
+      <view class="settings-cell">
+        <view class="settings-left">
+          <view class="settings-icon sync-icon">☁️</view>
+          <view class="settings-info">
+            <view class="settings-name">云端同步</view>
+            <view class="settings-sub">{{cloudEnabled ? '云开发已启用' : '当前使用本地缓存'}}</view>
+          </view>
+        </view>
+        <button class="sync-btn" bindtap="syncCloudNow" loading="{{syncing}}">同步</button>
+      </view>
+      <view class="cell-divider"></view>
+      <view class="settings-cell danger-cell" bindtap="clearAll">
+        <view class="settings-left">
+          <view class="settings-icon danger-icon">🗑️</view>
+          <view class="settings-name danger-text">清空本地数据</view>
+        </view>
+        <text class="settings-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 意见反馈 -->
+    <view class="group-title">意见反馈</view>
+    <view class="feedback-card">
+      <textarea
+        class="feedback-textarea"
+        value="{{feedbackText}}"
+        placeholder="例如：希望增加宠物出行清单、旅游目的地清单……"
+        placeholder-class="input-placeholder"
+        bindinput="onFeedbackInput"
+        maxlength="200"
+      />
+      <button class="feedback-btn" bindtap="submitFeedback">提交反馈</button>
+    </view>
+
+    <view class="bottom-safe"></view>
+  </view>
+
+</view>

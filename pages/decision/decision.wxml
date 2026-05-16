@@ -1,0 +1,73 @@
+<view class="page-wrap">
+  <view class="hero">
+    <view class="hero-title">选择困难症助手</view>
+    <view class="hero-sub">把选项写下来，剩下的交给小小随机。</view>
+  </view>
+
+  <view class="container">
+    <view class="section-title">快速开始</view>
+    <view class="quick-row">
+      <view
+        wx:for="{{quickSets}}"
+        wx:key="name"
+        class="quick-chip"
+        data-index="{{index}}"
+        bindtap="useQuickSet"
+      >{{item.name}}</view>
+    </view>
+
+    <view class="form-card">
+      <view class="label">这次要决定什么</view>
+      <input
+        class="title-input"
+        value="{{title}}"
+        placeholder="例如：晚饭吃什么"
+        placeholder-class="input-placeholder"
+        bindinput="onTitleInput"
+      />
+
+      <view class="label options-label">候选选项</view>
+      <view wx:for="{{options}}" wx:key="id" class="option-row">
+        <input
+          class="option-input"
+          value="{{item.text}}"
+          placeholder="输入一个选项"
+          placeholder-class="input-placeholder"
+          data-index="{{index}}"
+          bindinput="onOptionInput"
+        />
+        <view class="remove-btn" data-index="{{index}}" bindtap="removeOption">删除</view>
+      </view>
+
+      <button class="add-option-btn" bindtap="addOption">添加一个选项</button>
+    </view>
+
+    <view wx:if="{{result}}" class="result-card">
+      <view class="result-label">这次就选</view>
+      <view class="result-text">{{result}}</view>
+    </view>
+
+    <view class="action-row">
+      <button class="choose-btn" bindtap="chooseOne">帮我选一个</button>
+      <button class="reset-btn" bindtap="resetOptions">重填</button>
+    </view>
+
+    <view class="section-title history-title">最近选择</view>
+    <view wx:if="{{history.length === 0}}" class="empty-card">
+      <view class="empty-icon">🎲</view>
+      <view class="empty-text">还没有选择记录</view>
+    </view>
+
+    <view wx:if="{{history.length > 0}}" class="history-list">
+      <view wx:for="{{history}}" wx:key="id" class="history-item">
+        <view class="history-main">
+          <view class="history-title-text">{{item.title}}</view>
+          <view class="history-desc">选中了：{{item.result}}</view>
+        </view>
+      </view>
+      <button class="clear-btn" bindtap="clearHistory">清空记录</button>
+    </view>
+
+    <view class="bottom-safe"></view>
+  </view>
+</view>

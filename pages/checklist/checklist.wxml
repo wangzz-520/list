@@ -1,0 +1,107 @@
+<view class="page-wrap">
+
+  <!-- ─── 顶部信息卡 ─── -->
+  <view class="top-card">
+    <view class="title-row">
+      <view class="big-icon">{{icon}}</view>
+      <view class="title-info">
+        <view class="checklist-title">{{title}}</view>
+        <view class="checklist-desc">{{description}}</view>
+      </view>
+    </view>
+
+    <!-- 进度条 -->
+    <view class="progress-wrap">
+      <view class="progress-meta">
+        <text class="progress-label">完成进度</text>
+        <text class="progress-num">{{progress.done}} / {{progress.total}}</text>
+      </view>
+      <view class="progress-track">
+        <view class="progress-fill" style="width: {{progress.percent}}%;"></view>
+      </view>
+      <view class="progress-pct">{{progress.percent}}%</view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-row">
+      <button class="action-btn-ghost" bindtap="toggleFavorite">
+        <text>{{isFavorite ? '❤️' : '🤍'}}</text>
+        <text>{{isFavorite ? '已收藏' : '收藏'}}</text>
+      </button>
+      <button class="action-btn-ghost" open-type="share">
+        <text>📤</text>
+        <text>分享</text>
+      </button>
+    </view>
+  </view>
+
+  <view class="container">
+
+    <!-- ─── 添加事项 ─── -->
+    <view class="add-card">
+      <view class="add-label">快速添加事项</view>
+      <view class="add-row">
+        <input
+          class="add-input"
+          value="{{newItemText}}"
+          placeholder="例如：备用眼镜 / 车库遥控器"
+          placeholder-class="input-placeholder"
+          bindinput="onNewItemInput"
+          confirm-type="done"
+          bindconfirm="addItem"
+        />
+        <button class="add-submit" bindtap="addItem">添加</button>
+      </view>
+    </view>
+
+    <!-- ─── 任务分组 ─── -->
+    <view wx:for="{{groups}}" wx:key="id" wx:for-index="groupIndex" class="group-wrap">
+      <view class="group-header">
+        <text class="group-name">{{item.name}}</text>
+        <text class="group-count">{{item.items.length}} 项</text>
+      </view>
+
+      <view wx:if="{{item.items.length === 0}}" class="group-empty">暂时没有事项</view>
+
+      <view class="cell-group" wx:if="{{item.items.length > 0}}">
+        <view
+          wx:for="{{item.items}}"
+          wx:for-item="task"
+          wx:key="id"
+          wx:for-index="itemIndex"
+          class="task-cell {{task.checked ? 'task-done' : ''}}"
+          hover-class="task-hover"
+        >
+          <view
+            class="checkbox {{task.checked ? 'checked' : ''}}"
+            data-group-index="{{groupIndex}}"
+            data-item-index="{{itemIndex}}"
+            bindtap="toggleItem"
+          >
+            <text wx:if="{{task.checked}}" class="check-mark">✓</text>
+          </view>
+          <view
+            class="task-text {{task.checked ? 'text-done' : ''}}"
+            data-group-index="{{groupIndex}}"
+            data-item-index="{{itemIndex}}"
+            bindtap="toggleItem"
+          >{{task.text}}</view>
+          <view
+            class="task-delete"
+            data-group-index="{{groupIndex}}"
+            data-item-index="{{itemIndex}}"
+            bindtap="deleteItem"
+          >删除</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ─── 底部重置 ─── -->
+    <view class="bottom-actions">
+      <button class="danger-btn" bindtap="resetChecklist">重置当前清单</button>
+    </view>
+
+    <view class="bottom-safe"></view>
+  </view>
+
+</view>

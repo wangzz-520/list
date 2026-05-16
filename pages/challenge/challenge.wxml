@@ -1,0 +1,42 @@
+<view class="page-wrap">
+  <view class="hero">
+    <view class="hero-kicker">每日打卡挑战</view>
+    <view class="hero-title">{{todayChecked ? '今日已完成' : '今天也别漏掉重要事'}}</view>
+    <view class="hero-sub">{{encourageText}}</view>
+  </view>
+
+  <view class="container">
+    <view class="summary-card">
+      <view class="summary-item">
+        <view class="summary-num">{{streak}}</view>
+        <view class="summary-label">连续天数</view>
+      </view>
+      <view class="summary-line"></view>
+      <view class="summary-item">
+        <view class="summary-num">{{total}}</view>
+        <view class="summary-label">累计打卡</view>
+      </view>
+    </view>
+
+    <view class="check-card">
+      <view class="check-icon">{{todayChecked ? '✅' : '🔥'}}</view>
+      <view class="check-title">{{todayChecked ? '今天已经打卡' : '完成今日打卡'}}</view>
+      <view class="check-desc">日期：{{todayKey}}</view>
+      <button class="check-btn {{todayChecked ? 'checked' : ''}}" bindtap="checkIn">
+        {{todayChecked ? '已完成' : '立即打卡'}}
+      </button>
+    </view>
+
+    <view class="section-title">近 7 天</view>
+    <view class="week-card">
+      <view wx:for="{{recentDays}}" wx:key="key" class="day-item {{item.checked ? 'done' : ''}}">
+        <view class="day-dot">{{item.checked ? '✓' : ''}}</view>
+        <view class="day-week">周{{item.weekday}}</view>
+        <view class="day-date">{{item.day}}</view>
+      </view>
+    </view>
+
+    <button class="danger-btn reset-btn" bindtap="resetChallenge">清空打卡记录</button>
+    <view class="bottom-safe"></view>
+  </view>
+</view>

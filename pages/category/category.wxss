@@ -1,0 +1,181 @@
+.page-wrap {
+  min-height: 100vh;
+  background: #f6f8fb;
+}
+
+.tab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #ffffff;
+  box-shadow: 0 6rpx 18rpx rgba(42, 61, 102, 0.06);
+}
+
+.tab-scroll {
+  white-space: nowrap;
+}
+
+.tab-inner {
+  display: flex;
+  padding: 0 18rpx;
+}
+
+.tab-item {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 22rpx 0;
+}
+
+.tab-icon {
+  margin-bottom: 6rpx;
+  font-size: 30rpx;
+}
+
+.tab-text {
+  padding-bottom: 18rpx;
+  color: #697892;
+  font-size: 25rpx;
+}
+
+.tab-item.active .tab-text {
+  color: #2f6fed;
+  font-weight: 800;
+}
+
+.tab-line {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 42rpx;
+  height: 6rpx;
+  background: #2f6fed;
+  border-radius: 999rpx;
+  transform: translateX(-50%);
+}
+
+.cat-header {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  background: #ffffff;
+  border-bottom: 1rpx solid #e8edf6;
+}
+
+.cat-header-icon {
+  flex-shrink: 0;
+  width: 82rpx;
+  margin-right: 20rpx;
+  font-size: 52rpx;
+  text-align: center;
+}
+
+.cat-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cat-header-name {
+  color: #172033;
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.cat-header-desc {
+  margin-top: 6rpx;
+  color: #75839a;
+  font-size: 25rpx;
+  line-height: 1.5;
+}
+
+.container {
+  padding: 22rpx 24rpx 0;
+}
+
+.cell-group {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1rpx solid #e8edf6;
+  border-radius: 16rpx;
+}
+
+.list-cell {
+  display: flex;
+  align-items: center;
+  min-height: 128rpx;
+  padding: 22rpx 24rpx;
+  border-bottom: 1rpx solid #edf1f7;
+}
+
+.list-cell:last-child {
+  border-bottom: none;
+}
+
+.cell-hover {
+  background: #f2f6ff;
+}
+
+.cell-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 76rpx;
+  height: 76rpx;
+  margin-right: 20rpx;
+  font-size: 38rpx;
+  background: #edf4ff;
+  border-radius: 14rpx;
+}
+
+.cell-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cell-title {
+  overflow: hidden;
+  color: #172033;
+  font-size: 30rpx;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-desc {
+  margin-top: 6rpx;
+  overflow: hidden;
+  color: #75839a;
+  font-size: 24rpx;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-arrow {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  color: #b2bfd3;
+  font-size: 42rpx;
+}
+
+.empty-wrap {
+  padding: 96rpx 24rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 68rpx;
+}
+
+.empty-text {
+  margin-top: 14rpx;
+  color: #8793a8;
+  font-size: 27rpx;
+}
+
+.bottom-safe {
+  height: 56rpx;
+}

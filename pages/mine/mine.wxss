@@ -1,0 +1,262 @@
+.page-wrap {
+  min-height: 100vh;
+  background: #f6f8fb;
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 30rpx 72rpx;
+  text-align: center;
+  color: #ffffff;
+  background: linear-gradient(150deg, #2f6fed 0%, #5d91f4 100%);
+}
+
+.avatar-wrap {
+  margin-bottom: 18rpx;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 116rpx;
+  height: 116rpx;
+  font-size: 58rpx;
+  background: rgba(255, 255, 255, 0.22);
+  border: 4rpx solid rgba(255, 255, 255, 0.42);
+  border-radius: 50%;
+}
+
+.profile-name {
+  font-size: 36rpx;
+  font-weight: 800;
+}
+
+.profile-sub {
+  margin-top: 8rpx;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 24rpx;
+}
+
+.main-content {
+  min-height: 72vh;
+  padding: 10rpx 24rpx 0;
+  margin-top: -32rpx;
+  background: #f6f8fb;
+  border-radius: 28rpx 28rpx 0 0;
+}
+
+.group-title {
+  padding: 28rpx 6rpx 14rpx;
+  color: #4d5f7a;
+  font-size: 27rpx;
+  font-weight: 800;
+}
+
+.cell-group,
+.settings-group,
+.feedback-card,
+.empty-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1rpx solid #e8edf6;
+  border-radius: 16rpx;
+}
+
+.list-cell {
+  display: flex;
+  align-items: center;
+  min-height: 126rpx;
+  padding: 22rpx 24rpx;
+  border-bottom: 1rpx solid #edf1f7;
+}
+
+.list-cell:last-child {
+  border-bottom: none;
+}
+
+.cell-hover {
+  background: #f2f6ff;
+}
+
+.cell-icon-wrap {
+  flex-shrink: 0;
+}
+
+.cell-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 74rpx;
+  height: 74rpx;
+  margin-right: 20rpx;
+  font-size: 36rpx;
+  background: #edf4ff;
+  border-radius: 14rpx;
+}
+
+.cell-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cell-title {
+  overflow: hidden;
+  color: #172033;
+  font-size: 30rpx;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-desc {
+  margin-top: 6rpx;
+  overflow: hidden;
+  color: #75839a;
+  font-size: 24rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-arrow {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  color: #b2bfd3;
+  font-size: 42rpx;
+}
+
+.cell-delete {
+  flex-shrink: 0;
+  padding-left: 18rpx;
+  color: #d93f3f;
+  font-size: 24rpx;
+}
+
+.empty-card {
+  padding: 56rpx 20rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 60rpx;
+}
+
+.empty-text {
+  margin-top: 14rpx;
+  color: #8793a8;
+  font-size: 26rpx;
+}
+
+.settings-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 106rpx;
+  padding: 24rpx 26rpx;
+}
+
+.settings-left {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+
+.settings-icon {
+  flex-shrink: 0;
+  width: 52rpx;
+  margin-right: 18rpx;
+  font-size: 36rpx;
+  text-align: center;
+}
+
+.settings-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-name {
+  color: #172033;
+  font-size: 29rpx;
+  font-weight: 800;
+}
+
+.settings-sub {
+  margin-top: 4rpx;
+  color: #75839a;
+  font-size: 24rpx;
+}
+
+.settings-arrow {
+  color: #b2bfd3;
+  font-size: 42rpx;
+}
+
+.cell-divider {
+  height: 1rpx;
+  margin-left: 26rpx;
+  background: #edf1f7;
+}
+
+.danger-text {
+  color: #d93f3f;
+}
+
+.sync-btn {
+  flex-shrink: 0;
+  width: 120rpx;
+  height: 62rpx;
+  color: #2f6fed;
+  font-size: 25rpx;
+  font-weight: 800;
+  line-height: 62rpx;
+  background: #edf4ff;
+  border: none;
+  border-radius: 999rpx;
+}
+
+.sync-btn::after {
+  border: none;
+}
+
+.feedback-card {
+  padding: 26rpx;
+}
+
+.feedback-textarea {
+  width: 100%;
+  height: 180rpx;
+  padding: 20rpx;
+  color: #172033;
+  font-size: 27rpx;
+  line-height: 1.5;
+  background: #f3f6fb;
+  border-radius: 12rpx;
+}
+
+.feedback-btn {
+  width: 100%;
+  height: 80rpx;
+  margin-top: 18rpx;
+  color: #2f6fed;
+  font-size: 28rpx;
+  font-weight: 800;
+  line-height: 76rpx;
+  background: #ffffff;
+  border: 2rpx solid #c9d8fb;
+  border-radius: 12rpx;
+}
+
+.feedback-btn::after {
+  border: none;
+}
+
+.input-placeholder {
+  color: #a3afc2;
+}
+
+.bottom-safe {
+  height: 56rpx;
+}
