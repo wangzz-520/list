@@ -13,10 +13,6 @@
         <view class="stat-label">我的清单</view>
       </view>
       <view class="stat-item">
-        <view class="stat-num">{{stats.completedCount || 0}}</view>
-        <view class="stat-label">最近完成</view>
-      </view>
-      <view class="stat-item">
         <view class="stat-num">{{stats.pinnedCount || 0}}</view>
         <view class="stat-label">常用</view>
       </view>
@@ -32,11 +28,10 @@
           <view class="settings-sub">{{syncDesc}}</view>
         </view>
       </view>
-      <button class="sync-btn" bindtap="syncCloudNow" loading="{{syncing}}">同步</button>
     </view>
 
     <view class="section-row">
-      <view class="group-title">我的清单</view>
+      <view class="group-title">最近生成的清单</view>
     </view>
     <view wx:if="{{customLists.length === 0}}" class="empty-card">
       <image class="empty-icon" src="/assets/icons/edit.svg" mode="aspectFit"></image>
@@ -44,37 +39,14 @@
     </view>
     <view class="cell-group" wx:if="{{customLists.length > 0}}">
       <view wx:for="{{customLists}}" wx:key="id" class="list-cell">
-        <view class="cell-main" data-id="{{item.id}}" bindtap="goChecklist">
+        <view class="cell-main generated-main" data-id="{{item.id}}" bindtap="goChecklist">
           <view class="cell-icon">{{item.icon}}</view>
           <view class="cell-body">
             <view class="cell-title">{{item.title}}</view>
-            <view class="cell-desc">{{item.description}}</view>
+            <view class="cell-meta">{{item.itemCount}} 项 · {{item.generatedText}}</view>
           </view>
         </view>
-        <button class="text-btn" data-id="{{item.id}}" catchtap="copyList">复制</button>
-        <button class="text-btn danger" data-id="{{item.id}}" catchtap="removeCustom">删除</button>
-      </view>
-    </view>
-
-    <view class="group-title">最近完成</view>
-    <view wx:if="{{completedLists.length === 0}}" class="empty-card compact">
-      <view class="empty-text">完成一张清单后会自动记录在这里</view>
-    </view>
-    <view class="cell-group" wx:if="{{completedLists.length > 0}}">
-      <view wx:for="{{completedLists}}" wx:key="completedAt" class="list-cell">
-        <view
-          class="cell-main"
-          data-id="{{item.id}}"
-          data-share-id="{{item.shareId}}"
-          bindtap="goChecklist"
-        >
-          <view class="cell-icon done">{{item.icon}}</view>
-          <view class="cell-body">
-            <view class="cell-title">{{item.title}}</view>
-            <view class="cell-desc">{{item.completedDate}} · 已完成 {{item.progress.done || item.progress.total || 0}} 项</view>
-          </view>
-        </view>
-        <button class="text-btn" data-id="{{item.id}}" catchtap="copyList">复用</button>
+        <button class="text-btn danger compact" data-id="{{item.id}}" catchtap="removeCustom">删除</button>
       </view>
     </view>
 
@@ -91,7 +63,7 @@
             <view class="cell-desc">{{item.description}}</view>
           </view>
         </view>
-        <button class="text-btn danger" data-id="{{item.id}}" catchtap="unpinTemplate">取消</button>
+        <button class="text-btn danger compact" data-id="{{item.id}}" catchtap="unpinTemplate">取消</button>
       </view>
     </view>
 

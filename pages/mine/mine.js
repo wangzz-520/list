@@ -1,10 +1,19 @@
 const { findTemplateById, getAllTemplates } = require('../../data/templates');
 const storage = require('../../utils/storage');
 const cloudApi = require('../../utils/cloudApi');
-const cloudSync = require('../../utils/cloudSync');
 
 function formatTime(ts) {
   if (!ts) return '尚未同步';
+  const date = new Date(ts);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hour = String(date.getHours()).padStart(2, '0');
+  const minute = String(date.getMinutes()).padStart(2, '0');
+  return `${month}-${day} ${hour}:${minute}`;
+}
+
+function formatListTime(ts) {
+  if (!ts) return '刚刚生成';
   const date = new Date(ts);
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
@@ -25,6 +34,18 @@ function cloneGroups(groups) {
   }));
 }
 
+function countListItems(list) {
+  const groups = list.groups || [];
+  let total = 0;
+  groups.forEach(group => {
+    (group.items || []).forEach(item => {
+      if (!item) return;
+      total += 1;
+    });
+  });
+  return total;
+}
+
 function resolveSource(id) {
   if (!id) return null;
   if (id.startsWith('custom_')) return storage.getCustomList(id);
@@ -35,15 +56,13 @@ function resolveSource(id) {
 Page({
   data: {
     customLists: [],
-    completedLists: [],
     pinnedTemplates: [],
     stats: {},
     feedbackText: '',
     cloudEnabled: false,
     syncStatusText: '本地模式',
     syncDesc: '当前使用本地缓存',
-    lastSyncText: '尚未同步',
-    syncing: false
+    lastSyncText: '尚未同步'
   },
 
   onShow() {
@@ -51,8 +70,14 @@ Page({
   },
 
   refresh() {
-    const customLists = storage.getCustomLists();
-    const completedLists = storage.getCompletedLists().slice(0, 10);
+    const customLists = storage.getCustomLists()
+      .slice()
+      .sort((a, b) => Number(b.createdAt || b.updatedAt || 0) - Number(a.createdAt || a.updatedAt || 0))
+      .map(item => ({
+        ...item,
+        generatedText: `生成于 ${formatListTime(item.createdAt || item.updatedAt)}`,
+        itemCount: countListItems(item)
+      }));
     const allTemplates = getAllTemplates();
     const pinnedTemplates = storage.getPinnedTemplates()
       .map(id => allTemplates.find(item => item.id === id))
@@ -61,11 +86,9 @@ Page({
 
     this.setData({
       customLists,
-      completedLists,
       pinnedTemplates,
       stats: {
         customCount: customLists.length,
-        completedCount: completedLists.length,
         pinnedCount: pinnedTemplates.length
       },
       cloudEnabled,
@@ -160,23 +183,10 @@ Page({
     wx.showToast({ title: '已提交', icon: 'success' });
   },
 
-  async syncCloudNow() {
-    if (!cloudApi.isCloudReady()) {
-      wx.showToast({ title: '当前为本地模式', icon: 'none' });
-      return;
-    }
-    this.setData({ syncing: true });
-    await cloudSync.pushNow();
-    const result = await cloudSync.pullAndMerge();
-    this.setData({ syncing: false });
-    this.refresh();
-    wx.showToast({ title: result && result.ok ? '同步完成' : '同步失败', icon: 'none' });
-  },
-
   clearAll() {
     wx.showModal({
       title: '清空本地数据',
-      content: '收藏、常用、最近完成、自定义清单和勾选记录都会清空。请谨慎操作。',
+      content: '收藏、常用、生成的清单和勾选记录都会清空。请谨慎操作。',
       confirmColor: '#d93f3f',
       success: res => {
         if (!res.confirm) return;

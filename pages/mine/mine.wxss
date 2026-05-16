@@ -5,8 +5,8 @@
 
 .profile-header {
   padding: 42rpx 30rpx 72rpx;
-  color: #ffffff;
-  background: linear-gradient(150deg, #233f8f 0%, #2f6fed 62%, #6aa7ff 100%);
+  color: #172033;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8fd 100%);
 }
 
 .profile-top {
@@ -20,8 +20,8 @@
   height: 96rpx;
   padding: 18rpx;
   margin-right: 22rpx;
-  background: rgba(255, 255, 255, 0.22);
-  border: 3rpx solid rgba(255, 255, 255, 0.36);
+  background: #edf4ff;
+  border: 1rpx solid #dbe8ff;
   border-radius: 24rpx;
 }
 
@@ -31,6 +31,7 @@
 }
 
 .profile-name {
+  color: #172033;
   font-size: 38rpx;
   font-weight: 800;
   line-height: 1.25;
@@ -38,7 +39,7 @@
 
 .profile-sub {
   margin-top: 8rpx;
-  color: rgba(255, 255, 255, 0.82);
+  color: #75839a;
   font-size: 24rpx;
 }
 
@@ -53,12 +54,14 @@
   min-width: 0;
   padding: 20rpx 10rpx;
   text-align: center;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1rpx solid rgba(255, 255, 255, 0.24);
+  background: #ffffff;
+  border: 1rpx solid #e8edf6;
   border-radius: 16rpx;
+  box-shadow: 0 10rpx 24rpx rgba(42, 61, 102, 0.05);
 }
 
 .stat-num {
+  color: #2f6fed;
   font-size: 36rpx;
   font-weight: 800;
   line-height: 1.15;
@@ -66,8 +69,8 @@
 
 .stat-label {
   margin-top: 6rpx;
+  color: #75839a;
   font-size: 22rpx;
-  opacity: 0.86;
 }
 
 .main-content {
@@ -113,7 +116,7 @@
 
 .list-cell {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   min-height: 122rpx;
   padding: 20rpx 22rpx;
   border-bottom: 1rpx solid #edf1f7;
@@ -128,6 +131,10 @@
   flex: 1;
   min-width: 0;
   align-items: center;
+}
+
+.generated-main {
+  align-items: flex-start;
 }
 
 .cell-hover {
@@ -175,9 +182,17 @@
   white-space: nowrap;
 }
 
+.cell-meta {
+  margin-top: 8rpx;
+  overflow: hidden;
+  color: #75839a;
+  font-size: 23rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .text-btn,
-.mini-btn,
-.sync-btn {
+.mini-btn {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -192,6 +207,7 @@
   width: 82rpx;
   height: 56rpx;
   margin-left: 10rpx;
+  margin-top: 10rpx;
   color: #2f6fed;
   font-size: 24rpx;
   background: #edf4ff;
@@ -203,8 +219,13 @@
   background: #fff4f4;
 }
 
-.mini-btn,
-.sync-btn {
+.text-btn.compact {
+  width: 84rpx;
+  min-width: 84rpx;
+  font-size: 22rpx;
+}
+
+.mini-btn {
   width: 112rpx;
   height: 58rpx;
   color: #2f6fed;
@@ -214,8 +235,7 @@
 }
 
 .text-btn::after,
-.mini-btn::after,
-.sync-btn::after {
+.mini-btn::after {
   border: none;
 }
 

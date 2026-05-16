@@ -322,7 +322,7 @@ Page({
     }
     const id = `custom_${Date.now()}`;
     const title = isTemplate ? `我的${this.data.title}` : `${this.data.title} 副本`;
-    storage.saveCustomList({
+    const customList = {
       id,
       title,
       icon: this.data.icon || '✅',
@@ -331,7 +331,9 @@ Page({
         ? '从模板快速生成的我的清单，可继续编辑、勾选和分享。'
         : '从已有清单复制生成，可继续编辑、勾选和分享。',
       groups
-    });
+    };
+    storage.saveCustomList(customList);
+    storage.addRecent({ id, title, icon: customList.icon });
     wx.showToast({ title: isTemplate ? '已生成' : '已复制', icon: 'success' });
     setTimeout(() => {
       wx.navigateTo({ url: `/pages/checklist/checklist?id=${id}` });
