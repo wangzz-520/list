@@ -32,9 +32,10 @@
 
 ## 3. 云函数清单与依赖
 
-已检查 6 个云函数目录，均包含 `index.js` 和 `package.json`：
+已检查 7 个云函数目录，均包含 `index.js` 和 `package.json`：
 
 - `login`
+- `initDatabase`
 - `initTemplates`
 - `getTemplates`
 - `syncUserData`
@@ -54,14 +55,15 @@
 | `utils/storage.js` | `syncUserData` | `cloudfunctions/syncUserData` |
 | `utils/cloudApi.js` | `submitFeedback` | `cloudfunctions/submitFeedback` |
 | `utils/cloudApi.js` | `createShareList` | `cloudfunctions/createShareList` |
+| `utils/cloudApi.js` | `login` | `cloudfunctions/login` |
 
-`login` 和 `initTemplates` 是部署/初始化辅助函数，当前前端不直接调用，符合项目设计。
+`initDatabase` 和 `initTemplates` 是部署/初始化辅助函数，需在微信开发者工具中手动调用。
 
 ## 5. 页面云端数据调用
 
-- 首页：先加载 `data/templates.js` 本地热门模板，再调用 `cloudApi.getTemplates({ sortByHot: true })` 覆盖为云端热门模板；搜索时先本地搜索，再尝试云端搜索。
+- 首页：先加载 `data/templates.js` 本地热门模板，再调用 `cloudApi.getTemplates({ sortByHot: true })` 覆盖为云端热门模板。
 - 分类页：先按本地分类模板展示，再调用 `cloudApi.getTemplates({ category })` 覆盖为云端分类模板。
-- 我的页：使用本地缓存展示收藏、自定义清单；反馈提交会先写本地，再尝试调用 `submitFeedback`；“立即同步”会调用 `syncUserData` 执行 push/pull。
+- 我的页：使用本地缓存展示最近生成清单、常用清单和同步状态；反馈提交会先写本地，再尝试调用 `submitFeedback`；用户数据变更后会通过 `syncUserData` 自动同步。
 
 结论：首页、分类页、我的页均保留本地优先，并在云开发可用时调用云端能力。
 
@@ -101,8 +103,8 @@ cloudfunctions/*/package.json 依赖检查
 1. 在微信开发者工具中确认 `project.config.json` 的 `appid` 是你有权限管理的小程序 AppID。
 2. 在微信开发者工具中开通云开发环境。
 3. 如需指定环境，将 `config/cloud.js` 的 `CLOUD_ENV_ID` 填为云环境 ID；不填写则使用开发者工具当前默认云环境。
-4. 依次上传并部署 6 个云函数，选择“云端安装依赖”。
-5. 调用 `initTemplates` 初始化 `checklist_templates` 和 `app_config`。
+4. 依次上传并部署 7 个云函数，选择“云端安装依赖”。
+5. 先调用 `initDatabase` 创建集合，再调用 `initTemplates` 初始化 `checklist_templates` 和 `app_config`。
 6. 在首页、分类页、我的页验证云端读取、反馈提交和用户数据同步。
 
 ## 10. 合规边界

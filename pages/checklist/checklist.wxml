@@ -3,13 +3,13 @@
     <view class="title-row">
       <view class="big-icon">{{icon}}</view>
       <view class="title-info">
-        <view class="title-main-row">
-          <view class="checklist-title">{{title}}</view>
-          <view class="pin-inline-btn" wx:if="{{!isCustom}}" bindtap="togglePinned">
-            <text>{{isPinned ? '常用中' : '常用'}}</text>
+        <view class="checklist-title">{{title}}</view>
+        <view class="checklist-desc">{{description}}</view>
+        <view class="pin-action-row" wx:if="{{!isCustom}}">
+          <view class="pin-inline-btn" bindtap="togglePinned">
+            <text>{{isPinned ? '已加入常用' : '设为常用清单'}}</text>
           </view>
         </view>
-        <view class="checklist-desc">{{description}}</view>
       </view>
     </view>
 

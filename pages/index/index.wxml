@@ -15,14 +15,24 @@
     <view>
       <view class="action-grid">
         <view class="action-card primary" bindtap="goMine" hover-class="cell-hover">
-          <image class="action-icon" src="/assets/icons/folder.svg" mode="aspectFit"></image>
-          <view class="action-title">查看清单</view>
-          <view class="action-desc">我的清单和最近完成</view>
+          <view class="action-icon-wrap">
+            <image class="action-icon" src="/assets/icons/folder.svg" mode="aspectFit"></image>
+          </view>
+          <view class="action-copy">
+            <view class="action-title">查看清单</view>
+            <view class="action-desc">最近生成与常用清单</view>
+          </view>
+          <text class="action-arrow">›</text>
         </view>
         <view class="action-card" bindtap="goDecision" hover-class="cell-hover">
-          <image class="action-icon" src="/assets/icons/dice.svg" mode="aspectFit"></image>
-          <view class="action-title">选择助手</view>
-          <view class="action-desc">吃什么、去哪玩</view>
+          <view class="action-icon-wrap soft">
+            <image class="action-icon" src="/assets/icons/dice.svg" mode="aspectFit"></image>
+          </view>
+          <view class="action-copy">
+            <view class="action-title">选择困难症助手</view>
+            <view class="action-desc">帮你快速做决定</view>
+          </view>
+          <text class="action-arrow">›</text>
         </view>
       </view>
 

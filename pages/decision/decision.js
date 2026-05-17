@@ -14,14 +14,6 @@ function cleanOptions(options) {
     .slice(0, 20);
 }
 
-function buildChecklistItems(options) {
-  return options.map((text, index) => ({
-    id: `item_${Date.now()}_${index}_${Math.floor(Math.random() * 1000)}`,
-    text,
-    custom: true
-  }));
-}
-
 Page({
   data: {
     title: '',
@@ -125,36 +117,6 @@ Page({
     storage.addDecisionHistory({ title, result, options });
     this.setData({ result });
     this.refreshHistory();
-  },
-
-  saveAsChecklist() {
-    const options = cleanOptions(this.data.options);
-    if (options.length < 1) {
-      wx.showToast({ title: '请先填写选项', icon: 'none' });
-      return;
-    }
-
-    const title = String(this.data.title || '').trim() || '选择清单';
-    const id = `custom_${Date.now()}`;
-    storage.saveCustomList({
-      id,
-      title: title.includes('清单') ? title : `${title}选择清单`,
-      icon: '🎲',
-      category: 'custom',
-      description: '从选择困难症助手保存的候选清单，可继续勾选和复用。',
-      groups: [
-        {
-          id: 'decision_options',
-          name: '候选选项',
-          items: buildChecklistItems(options)
-        }
-      ]
-    });
-
-    wx.showToast({ title: '已保存', icon: 'success' });
-    setTimeout(() => {
-      wx.navigateTo({ url: `/pages/checklist/checklist?id=${id}` });
-    }, 350);
   },
 
   resetOptions() {
