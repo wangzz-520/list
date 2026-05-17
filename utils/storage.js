@@ -221,6 +221,10 @@ function getLastCloudSyncAt() {
   return read(KEYS.LAST_CLOUD_SYNC_AT, 0);
 }
 
+function markCloudSyncedAt(ts = Date.now()) {
+  return write(KEYS.LAST_CLOUD_SYNC_AT, ts, { silent: true });
+}
+
 function formatDate(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -361,6 +365,7 @@ module.exports = {
   addFeedback,
   getFeedbacks,
   getLastCloudSyncAt,
+  markCloudSyncedAt,
   getTodayKey,
   getDecisionHistory,
   addDecisionHistory,

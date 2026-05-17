@@ -4,21 +4,22 @@
 }
 
 .hero {
-  padding: 40rpx 32rpx 70rpx;
-  color: #ffffff;
-  background: linear-gradient(135deg, #233f8f 0%, #2f6fed 58%, #6aa7ff 100%);
+  padding: 42rpx 30rpx 72rpx;
+  color: #172033;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8fd 100%);
 }
 
 .hero-title {
-  font-size: 42rpx;
+  color: #172033;
+  font-size: 38rpx;
   font-weight: 800;
   line-height: 1.25;
 }
 
 .hero-sub {
   margin-top: 12rpx;
-  color: rgba(255, 255, 255, 0.86);
-  font-size: 26rpx;
+  color: #75839a;
+  font-size: 24rpx;
   line-height: 1.55;
 }
 

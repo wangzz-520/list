@@ -1,5 +1,7 @@
 const cloudConfig = require('./config/cloud');
 const cloudSync = require('./utils/cloudSync');
+const cloudApi = require('./utils/cloudApi');
+const storage = require('./utils/storage');
 
 function getMiniProgramAppId() {
   try {
@@ -16,6 +18,9 @@ App({
     version: '1.1.0-cloud',
     storageVersion: 'v1',
     cloudReady: false,
+    openid: '',
+    appid: '',
+    unionid: '',
     cloudSyncTimer: null
   },
 
@@ -45,6 +50,18 @@ App({
       wx.cloud.init(initOptions);
       this.globalData.cloudReady = true;
       console.log('云开发初始化完成');
+
+      cloudApi.login().then(result => {
+        if (!result || !result.openid) {
+          console.warn('获取 openid 失败，用户数据仍会由云函数按 _openid 隔离', result || {});
+          return;
+        }
+        this.globalData.openid = result.openid;
+        this.globalData.appid = result.appid || '';
+        this.globalData.unionid = result.unionid || '';
+        storage.markCloudSyncedAt();
+        console.log('openid 获取完成');
+      });
 
       cloudSync.pullAndMerge().then(result => {
         if (result && result.ok) {

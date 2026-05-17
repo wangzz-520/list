@@ -1,14 +1,12 @@
-const { categories, getCategoryById, getTemplatesByCategory, searchTemplates } = require('../../data/templates');
+const { categories, getCategoryById, getTemplatesByCategory } = require('../../data/templates');
 const cloudApi = require('../../utils/cloudApi');
 
 Page({
   data: {
-    keyword: '',
     categories,
     activeCategory: 'travel',
     activeCategoryInfo: categories[0],
     templates: [],
-    searchResults: [],
     cloudEnabled: false
   },
 
@@ -24,28 +22,7 @@ Page({
 
   selectCategory(event) {
     const id = event.currentTarget.dataset.id;
-    this.setData({ keyword: '', searchResults: [] });
     this.loadCategory(id);
-  },
-
-  onSearchInput(event) {
-    const keyword = event.detail.value;
-    this.setData({
-      keyword,
-      searchResults: keyword ? searchTemplates(keyword).slice(0, 30) : []
-    });
-
-    if (keyword) {
-      this.searchCloudTemplates(keyword);
-    }
-  },
-
-  async searchCloudTemplates(keyword) {
-    const rows = await cloudApi.getTemplates({ keyword, limit: 30 });
-    if (!rows || rows.length === 0) return;
-    if (this.data.keyword === keyword) {
-      this.setData({ searchResults: rows });
-    }
   },
 
   loadCategory(id) {

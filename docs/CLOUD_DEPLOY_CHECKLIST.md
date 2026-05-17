@@ -11,6 +11,7 @@
 ## 云函数部署
 
 - [ ] 部署 `login`
+- [ ] 部署 `initDatabase`
 - [ ] 部署 `initTemplates`
 - [ ] 部署 `getTemplates`
 - [ ] 部署 `syncUserData`
@@ -19,8 +20,10 @@
 
 ## 数据初始化
 
+- [ ] 调用 `initDatabase`
+- [ ] 检查 5 个集合已创建
 - [ ] 调用 `initTemplates`
-- [ ] 检查 `checklist_templates` 有 20 条模板
+- [ ] 检查 `checklist_templates` 有模板数据
 - [ ] 检查 `app_config` 有 categories 配置
 
 ## 小程序测试

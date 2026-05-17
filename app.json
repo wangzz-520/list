@@ -40,6 +40,11 @@
       }
     ]
   },
+  "permission": {
+    "scope.writePhotosAlbum": {
+      "desc": "用于将生成的清单图片保存到相册"
+    }
+  },
   "style": "v2",
   "lazyCodeLoading": "requiredComponents"
 }

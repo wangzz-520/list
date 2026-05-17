@@ -84,6 +84,8 @@ Page({
       .filter(Boolean);
     const cloudEnabled = cloudApi.isCloudReady();
 
+    const lastSyncAt = storage.getLastCloudSyncAt();
+
     this.setData({
       customLists,
       pinnedTemplates,
@@ -94,9 +96,9 @@ Page({
       cloudEnabled,
       syncStatusText: cloudEnabled ? '云同步可用' : '本地模式',
       syncDesc: cloudEnabled
-        ? `云同步可用，最近同步：${formatTime(storage.getLastCloudSyncAt())}`
+        ? `云端连接正常，最近同步：${formatTime(lastSyncAt)}`
         : '当前使用本地缓存，配置云环境后可同步',
-      lastSyncText: cloudEnabled ? formatTime(storage.getLastCloudSyncAt()) : '未启用云同步'
+      lastSyncText: cloudEnabled ? formatTime(lastSyncAt) : '未启用云同步'
     });
   },
 
@@ -183,17 +185,10 @@ Page({
     wx.showToast({ title: '已提交', icon: 'success' });
   },
 
-  clearAll() {
-    wx.showModal({
-      title: '清空本地数据',
-      content: '收藏、常用、生成的清单和勾选记录都会清空。请谨慎操作。',
-      confirmColor: '#d93f3f',
-      success: res => {
-        if (!res.confirm) return;
-        storage.clearAllUserData();
-        this.refresh();
-        wx.showToast({ title: '已清空', icon: 'success' });
-      }
-    });
+  onShareAppMessage() {
+    return {
+      title: '万能生活清单助手：出门、搬家、待产都不怕漏',
+      path: '/pages/index/index'
+    };
   }
 });

@@ -3,10 +3,60 @@ const storage = require('../../utils/storage');
 const cloudApi = require('../../utils/cloudApi');
 const { normalizeGroups, calcProgress, clone } = require('../../utils/checklist');
 
+function leaveInvalidPage() {
+  const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+  if (pages.length > 1) {
+    wx.navigateBack({ delta: 1 });
+    return;
+  }
+  wx.switchTab({ url: '/pages/index/index' });
+}
+
+function normalizeListName(value, fallback) {
+  const text = String(value || '').trim();
+  return text || fallback;
+}
+
+function flattenPosterItems(groups) {
+  const rows = [];
+  (groups || []).forEach(group => {
+    rows.push({ type: 'group', text: group.name || '清单分组' });
+    (group.items || []).forEach(item => {
+      rows.push({
+        type: 'item',
+        text: typeof item === 'string' ? item : item.text
+      });
+    });
+  });
+  return rows;
+}
+
+function clipText(text, maxLength) {
+  const value = String(text || '');
+  return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.arcTo(x + width, y, x + width, y + radius, radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);
+  ctx.lineTo(x + radius, y + height);
+  ctx.arcTo(x, y + height, x, y + height - radius, radius);
+  ctx.lineTo(x, y + radius);
+  ctx.arcTo(x, y, x + radius, y, radius);
+  ctx.closePath();
+}
+
 Page({
   data: {
     listId: '',
+    loaded: false,
     title: '',
+    listName: '',
+    nameLabel: '生成后的清单名称',
     icon: '✅',
     description: '',
     shareId: '',
@@ -16,7 +66,6 @@ Page({
     progressLabel: '完成进度',
     checkedCellClass: 'task-done',
     checkedTextClass: 'text-done',
-    isFavorite: false,
     isPinned: false,
     isCustom: false,
     isShared: false,
@@ -24,6 +73,8 @@ Page({
     newItemText: '',
     addGroupIndex: 0,
     groupOptions: [],
+    posterHeight: 1400,
+    generating: false,
     cloudEnabled: false
   },
 
@@ -39,7 +90,7 @@ Page({
     const source = await cloudApi.getShareList(shareId);
     if (!source) {
       wx.showToast({ title: '共享清单不存在', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 800);
+      setTimeout(leaveInvalidPage, 800);
       return;
     }
 
@@ -52,9 +103,12 @@ Page({
     wx.setNavigationBarTitle({ title: source.title });
 
     this.setData({
+      loaded: true,
       listId,
       shareId: source.id,
       title: source.title,
+      listName: `${source.title} 副本`,
+      nameLabel: '复制后的清单名称',
       icon: source.icon || '✅',
       description: '来自好友分享的清单快照。',
       originalGroups: source.groups || [],
@@ -65,7 +119,6 @@ Page({
       checkedTextClass: 'text-done',
       addGroupIndex: 0,
       groupOptions: groups.map(group => group.name),
-      isFavorite: false,
       isPinned: false,
       isCustom: false,
       isShared: true,
@@ -77,6 +130,7 @@ Page({
   async loadChecklist(id) {
     if (!id) {
       wx.showToast({ title: '清单不存在', icon: 'none' });
+      setTimeout(leaveInvalidPage, 800);
       return;
     }
 
@@ -94,7 +148,7 @@ Page({
 
     if (!source) {
       wx.showToast({ title: '清单不存在', icon: 'none' });
-      setTimeout(() => wx.navigateBack(), 800);
+      setTimeout(leaveInvalidPage, 800);
       return;
     }
 
@@ -106,9 +160,12 @@ Page({
     wx.setNavigationBarTitle({ title: source.title });
 
     this.setData({
+      loaded: true,
       listId: source.id,
       shareId: '',
       title: source.title,
+      listName: isCustom ? source.title : `我的${source.title}`,
+      nameLabel: isCustom ? '清单名称' : '生成后的清单名称',
       icon: source.icon || '✅',
       description: source.description || '',
       originalGroups: source.groups || [],
@@ -119,7 +176,6 @@ Page({
       checkedTextClass: isCustom ? 'text-done' : '',
       addGroupIndex: 0,
       groupOptions: groups.map(group => group.name),
-      isFavorite: storage.isFavorite(source.id),
       isPinned: storage.isPinnedTemplate(source.id),
       isCustom,
       isShared: false,
@@ -171,6 +227,9 @@ Page({
   },
 
   toggleItem(event) {
+    if (this.data.isCustom) {
+      return;
+    }
     const groupIndex = Number(event.currentTarget.dataset.groupIndex);
     const itemIndex = Number(event.currentTarget.dataset.itemIndex);
     const previousProgress = this.data.progress;
@@ -184,6 +243,24 @@ Page({
 
   onNewItemInput(event) {
     this.setData({ newItemText: event.detail.value });
+  },
+
+  onListNameInput(event) {
+    this.setData({ listName: event.detail.value });
+  },
+
+  saveListName() {
+    if (!this.data.isCustom) return;
+    const title = normalizeListName(this.data.listName, this.data.title);
+    const source = storage.getCustomList(this.data.listId);
+    if (!source) return;
+    storage.saveCustomList({
+      ...source,
+      title
+    });
+    storage.addRecent({ id: source.id, title, icon: source.icon || this.data.icon });
+    this.setData({ title, listName: title });
+    wx.setNavigationBarTitle({ title });
   },
 
   onAddGroupChange(event) {
@@ -237,6 +314,7 @@ Page({
         if (!res.confirm) return;
         groups[groupIndex].items.splice(itemIndex, 1);
 
+        const previousProgress = this.data.progress;
         const draft = storage.getDraft(this.data.listId);
         draft.deletedIds = draft.deletedIds || [];
         draft.extraItemsByGroup = draft.extraItemsByGroup || {};
@@ -249,18 +327,11 @@ Page({
         }
 
         if (draft.checkedMap) delete draft.checkedMap[task.id];
-        const previousProgress = this.data.progress;
         storage.saveDraft(this.data.listId, draft);
         this.refresh(groups);
         this.handleCompletion(previousProgress, groups);
       }
     });
-  },
-
-  toggleFavorite() {
-    const result = storage.toggleFavorite(this.data.listId);
-    this.setData({ isFavorite: result });
-    wx.showToast({ title: result ? '已收藏' : '已取消', icon: 'none' });
   },
 
   togglePinned() {
@@ -312,7 +383,190 @@ Page({
     }).filter(group => group.items.length > 0);
   },
 
-  copyChecklist() {
+  drawPosterText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+    const chars = String(text || '').split('');
+    const lines = [];
+    let line = '';
+    chars.forEach(char => {
+      const testLine = line + char;
+      if (ctx.measureText(testLine).width > maxWidth && line) {
+        lines.push(line);
+        line = char;
+      } else {
+        line = testLine;
+      }
+    });
+    if (line) lines.push(line);
+    lines.slice(0, maxLines || lines.length).forEach((row, index) => {
+      ctx.fillText(row, x, y + index * lineHeight);
+    });
+    return y + Math.min(lines.length, maxLines || lines.length) * lineHeight;
+  },
+
+  canvasToTempFilePath(height) {
+    return new Promise((resolve, reject) => {
+      wx.canvasToTempFilePath({
+        canvasId: 'checklistPoster',
+        width: 600,
+        height,
+        destWidth: 1200,
+        destHeight: height * 2,
+        success: res => resolve(res.tempFilePath),
+        fail: reject
+      }, this);
+    });
+  },
+
+  saveImageToAlbum(filePath) {
+    return new Promise(resolve => {
+      wx.saveImageToPhotosAlbum({
+        filePath,
+        success: () => resolve(true),
+        fail: error => {
+          console.warn('save checklist image failed:', error);
+          resolve(false);
+        }
+      });
+    });
+  },
+
+  saveChecklistImage(list) {
+    return new Promise(resolve => {
+      const ctx = wx.createCanvasContext('checklistPoster', this);
+      const rows = flattenPosterItems(list.groups || []);
+      const itemCount = rows.filter(row => row.type === 'item').length;
+      const maxRows = 80;
+      const renderedRows = rows.slice(0, maxRows);
+      const groupCount = renderedRows.filter(row => row.type === 'group').length;
+      const rowCount = renderedRows.length - groupCount;
+      const posterHeight = Math.max(900, 360 + groupCount * 50 + rowCount * 44 + 150);
+      const footerY = posterHeight - 54;
+      this.setData({ posterHeight });
+
+      ctx.setFillStyle('#eef4ff');
+      ctx.fillRect(0, 0, 600, posterHeight);
+
+      ctx.setFillStyle('#dfeaff');
+      ctx.beginPath();
+      ctx.arc(520, 86, 110, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.setFillStyle('#f8fbff');
+      ctx.beginPath();
+      ctx.arc(76, posterHeight - 160, 150, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.setFillStyle('#ffffff');
+      roundRect(ctx, 34, 34, 532, posterHeight - 68, 28);
+      ctx.fill();
+
+      const gradient = ctx.createLinearGradient(34, 34, 566, 196);
+      gradient.addColorStop(0, '#2f6fed');
+      gradient.addColorStop(1, '#6aa7ff');
+      ctx.setFillStyle(gradient);
+      roundRect(ctx, 34, 34, 532, 172, 28);
+      ctx.fill();
+
+      ctx.setFillStyle('rgba(255, 255, 255, 0.22)');
+      ctx.beginPath();
+      ctx.arc(492, 74, 64, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.setFillStyle('#ffffff');
+      roundRect(ctx, 58, 58, 62, 62, 16);
+      ctx.fill();
+
+      ctx.setFillStyle('#2f6fed');
+      ctx.setFontSize(34);
+      ctx.fillText(list.icon || '✓', 72, 101);
+
+      ctx.setFillStyle('rgba(255, 255, 255, 0.86)');
+      ctx.setFontSize(18);
+      ctx.fillText('万能生活清单助手', 136, 80);
+
+      ctx.setFillStyle('#ffffff');
+      ctx.setFontSize(31);
+      ctx.fillText(clipText(list.title, 14), 136, 120);
+
+      ctx.setFillStyle('#172033');
+      roundRect(ctx, 58, 232, 484, 74, 18);
+      ctx.setFillStyle('#f5f8fd');
+      ctx.fill();
+
+      ctx.setFillStyle('#2f6fed');
+      ctx.setFontSize(24);
+      ctx.fillText(`${itemCount}`, 84, 278);
+
+      ctx.setFillStyle('#75839a');
+      ctx.setFontSize(18);
+      ctx.fillText('个事项已整理好', 128, 276);
+
+      ctx.setFillStyle('#19a974');
+      roundRect(ctx, 408, 250, 108, 32, 16);
+      ctx.fill();
+      ctx.setFillStyle('#ffffff');
+      ctx.setFontSize(16);
+      ctx.fillText('可勾选', 436, 272);
+
+      let y = 348;
+      let renderedItems = 0;
+      renderedRows.forEach(row => {
+        if (row.type === 'group') {
+          y += 14;
+          ctx.setFillStyle('#edf4ff');
+          roundRect(ctx, 58, y - 24, 484, 38, 12);
+          ctx.fill();
+          ctx.setFillStyle('#2f6fed');
+          ctx.setFontSize(19);
+          ctx.fillText(clipText(row.text, 18), 76, y);
+          y += 36;
+          return;
+        }
+
+        ctx.setFillStyle('#ffffff');
+        roundRect(ctx, 58, y - 24, 484, 42, 12);
+        ctx.fill();
+
+        ctx.setStrokeStyle('#c9d8fb');
+        ctx.setLineWidth(3);
+        ctx.beginPath();
+        ctx.arc(78, y - 2, 10, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.setFillStyle('#172033');
+        ctx.setFontSize(19);
+        this.drawPosterText(ctx, clipText(row.text, 24), 102, y + 5, 390, 24, 1);
+        y += 44;
+        renderedItems += 1;
+      });
+
+      if (itemCount > renderedItems) {
+        ctx.setFillStyle('#8793a8');
+        ctx.setFontSize(18);
+        ctx.fillText(`还有 ${itemCount - renderedItems} 项，请在小程序内查看`, 74, footerY - 28);
+      }
+
+      ctx.setFillStyle('#b2bfd3');
+      ctx.setFontSize(16);
+      ctx.fillText('保存图片后，也可在“我的清单中心”继续勾选', 92, footerY);
+
+      ctx.draw(false, () => {
+        setTimeout(async () => {
+          try {
+            const filePath = await this.canvasToTempFilePath(posterHeight);
+            const saved = await this.saveImageToAlbum(filePath);
+            resolve(saved);
+          } catch (error) {
+            console.warn('create checklist image failed:', error);
+            resolve(false);
+          }
+        }, 120);
+      });
+    });
+  },
+
+  async copyChecklist() {
+    if (this.data.generating) return;
     const isTemplate = !this.data.isCustom && !this.data.isShared;
     const sourceGroups = this.data.groups;
     const groups = this.buildCustomGroups(sourceGroups, { onlySelected: isTemplate });
@@ -320,8 +574,10 @@ Page({
       wx.showToast({ title: '请先勾选要生成的事项', icon: 'none' });
       return;
     }
+    this.setData({ generating: true });
     const id = `custom_${Date.now()}`;
-    const title = isTemplate ? `我的${this.data.title}` : `${this.data.title} 副本`;
+    const fallbackTitle = isTemplate ? `我的${this.data.title}` : `${this.data.title} 副本`;
+    const title = normalizeListName(this.data.listName, fallbackTitle);
     const customList = {
       id,
       title,
@@ -334,10 +590,21 @@ Page({
     };
     storage.saveCustomList(customList);
     storage.addRecent({ id, title, icon: customList.icon });
-    wx.showToast({ title: isTemplate ? '已生成' : '已复制', icon: 'success' });
+    if (isTemplate) {
+      storage.clearDraft(this.data.listId);
+      const resetGroups = normalizeGroups(this.data.originalGroups, storage.getDraft(this.data.listId));
+      this.refresh(resetGroups);
+    }
+    const savedImage = await this.saveChecklistImage(customList);
+    this.setData({ generating: false });
+    wx.showToast({
+      title: savedImage ? '已保存图片' : (isTemplate ? '已生成' : '已复制'),
+      icon: 'success',
+      duration: 700
+    });
     setTimeout(() => {
-      wx.navigateTo({ url: `/pages/checklist/checklist?id=${id}` });
-    }, 400);
+      wx.switchTab({ url: '/pages/index/index' });
+    }, 300);
   },
 
   async createCloudShare() {

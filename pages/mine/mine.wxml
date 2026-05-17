@@ -80,12 +80,16 @@
         <text class="settings-arrow">›</text>
       </view>
       <view class="cell-divider"></view>
-      <view class="settings-cell danger-cell" bindtap="clearAll">
+      <view class="settings-cell share-row">
         <view class="settings-left">
-          <image class="settings-icon-img" src="/assets/icons/trash.svg" mode="aspectFit"></image>
-          <view class="settings-name danger-text">清空本地数据</view>
+          <image class="settings-icon-img" src="/assets/icons/share.svg" mode="aspectFit"></image>
+          <view class="settings-info">
+            <view class="settings-name">分享小程序</view>
+            <view class="settings-sub">推荐给家人朋友一起用</view>
+          </view>
         </view>
         <text class="settings-arrow">›</text>
+        <button class="share-hit" open-type="share"></button>
       </view>
     </view>
 

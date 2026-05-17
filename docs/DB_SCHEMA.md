@@ -63,6 +63,9 @@
     "feedbacks": [],
     "clientExportedAt": 1710000000000
   },
+  "appid": "小程序appid",
+  "unionid": "用户unionid，没有则为空",
+  "lastLoginAt": "serverDate",
   "createdAt": "serverDate",
   "updatedAt": "serverDate"
 }
