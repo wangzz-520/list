@@ -1,5 +1,15 @@
-const { categories, getCategoryById, getTemplatesByCategory } = require('../../data/templates');
+const { categories, findTemplateById, getCategoryById, getTemplatesByCategory } = require('../../data/templates');
 const cloudApi = require('../../utils/cloudApi');
+
+function mergeLocalTemplateMeta(row) {
+  const local = findTemplateById(row && row.id);
+  if (!local) return row;
+  return {
+    ...row,
+    icon: local.icon || row.icon,
+    category: row.category || local.category
+  };
+}
 
 function sortCloudRowsByLocalOrder(categoryId, cloudRows) {
   const localRows = getTemplatesByCategory(categoryId);
@@ -9,6 +19,7 @@ function sortCloudRowsByLocalOrder(categoryId, cloudRows) {
   });
 
   return (cloudRows || [])
+    .map(mergeLocalTemplateMeta)
     .slice()
     .sort((a, b) => {
       const aOrder = orderMap[a.id];

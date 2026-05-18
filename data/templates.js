@@ -28,7 +28,7 @@ const templates = [
     id: 'documents_material',
     title: '办事证件清单',
     category: 'daily',
-    icon: '🪪',
+    icon: '🧾',
     heat: 90,
     description: '办证、入职、报销、学校提交材料前，把证件和复印件一次带齐。',
     groups: [

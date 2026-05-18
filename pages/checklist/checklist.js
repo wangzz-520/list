@@ -148,7 +148,12 @@ Page({
     } else {
       source = findTemplateById(id);
       const cloudSource = await cloudApi.getTemplateById(id);
-      if (cloudSource) source = cloudSource;
+      if (cloudSource) {
+        source = {
+          ...cloudSource,
+          icon: source && source.icon ? source.icon : cloudSource.icon
+        };
+      }
     }
 
     if (!source) {
