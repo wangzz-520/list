@@ -85,6 +85,7 @@ cloudfunctions/getTemplates
 cloudfunctions/syncUserData
 cloudfunctions/submitFeedback
 cloudfunctions/createShareList
+cloudfunctions/getShareQrCode
 ```
 
 ## 7. 初始化集合和基础数据
