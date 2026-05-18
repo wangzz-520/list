@@ -115,7 +115,7 @@ Page({
       listName: `${source.title} 副本`,
       nameLabel: '复制后的清单名称',
       icon: source.icon || '✓',
-      description: '来自好友分享的清单快照。',
+      description: '来自好友分享的清单快照，可复制为自己的清单继续使用。',
       originalGroups: source.groups || [],
       groups,
       progress,
@@ -127,7 +127,7 @@ Page({
       isPinned: false,
       isCustom: false,
       isShared: true,
-      primaryCopyText: '复制分享清单',
+      primaryCopyText: '复制为我的清单',
       cloudEnabled: cloudApi.isCloudReady()
     });
   },
@@ -232,7 +232,7 @@ Page({
   },
 
   toggleItem(event) {
-    if (this.data.isCustom) {
+    if (this.data.isCustom || this.data.isShared) {
       return;
     }
     const groupIndex = Number(event.currentTarget.dataset.groupIndex);
@@ -308,6 +308,9 @@ Page({
   deleteItem(event) {
     if (event && typeof event.stopPropagation === 'function') {
       event.stopPropagation();
+    }
+    if (this.data.isShared) {
+      return;
     }
     const groupIndex = Number(event.currentTarget.dataset.groupIndex);
     const itemIndex = Number(event.currentTarget.dataset.itemIndex);
