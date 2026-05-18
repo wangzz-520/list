@@ -8,7 +8,7 @@
       </view>
     </view>
     <view class="banner-title">生活清单，一项项不漏</view>
-    <view class="banner-sub">查看清单、场景模板、选择助手，都从这里开始。</view>
+    <view class="banner-sub">查看清单、场景模板、选择困难症助手，都从这里开始。</view>
   </view>
 
   <view class="main-content">
@@ -94,4 +94,5 @@
 
     <view class="bottom-safe"></view>
   </view>
+
 </view>

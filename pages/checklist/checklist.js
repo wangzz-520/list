@@ -1,4 +1,4 @@
-const { findTemplateById } = require('../../data/templates');
+﻿const { findTemplateById } = require('../../data/templates');
 const storage = require('../../utils/storage');
 const cloudApi = require('../../utils/cloudApi');
 const cloudSync = require('../../utils/cloudSync');
@@ -58,7 +58,7 @@ Page({
     title: '',
     listName: '',
     nameLabel: '生成后的清单名称',
-    icon: '✅',
+    icon: '✓',
     description: '',
     shareId: '',
     originalGroups: [],
@@ -110,7 +110,7 @@ Page({
       title: source.title,
       listName: `${source.title} 副本`,
       nameLabel: '复制后的清单名称',
-      icon: source.icon || '✅',
+      icon: source.icon || '✓',
       description: '来自好友分享的清单快照。',
       originalGroups: source.groups || [],
       groups,
@@ -167,7 +167,7 @@ Page({
       title: source.title,
       listName: isCustom ? source.title : `我的${source.title}`,
       nameLabel: isCustom ? '清单名称' : '生成后的清单名称',
-      icon: source.icon || '✅',
+      icon: source.icon || '✓',
       description: source.description || '',
       originalGroups: source.groups || [],
       groups,
@@ -222,7 +222,7 @@ Page({
       progress
     });
     wx.showToast({
-      title: '清单完成',
+      title: '娓呭崟瀹屾垚',
       icon: 'success'
     });
   },
@@ -344,7 +344,7 @@ Page({
       return;
     }
     if (this.data.isShared) {
-      wx.showToast({ title: '共享清单不能设常用', icon: 'none' });
+      wx.showToast({ title: '共享清单不能设为常用', icon: 'none' });
       return;
     }
     const result = storage.togglePinnedTemplate(this.data.listId);
@@ -510,7 +510,7 @@ Page({
       ctx.fill();
       ctx.setFillStyle('#ffffff');
       ctx.setFontSize(16);
-      ctx.fillText('可勾选', 436, 272);
+      ctx.fillText('可查看', 436, 272);
 
       let y = 348;
       let renderedItems = 0;
@@ -531,15 +531,9 @@ Page({
         roundRect(ctx, 58, y - 24, 484, 42, 12);
         ctx.fill();
 
-        ctx.setStrokeStyle('#c9d8fb');
-        ctx.setLineWidth(3);
-        ctx.beginPath();
-        ctx.arc(78, y - 2, 10, 0, Math.PI * 2);
-        ctx.stroke();
-
         ctx.setFillStyle('#172033');
         ctx.setFontSize(19);
-        this.drawPosterText(ctx, clipText(row.text, 24), 102, y + 5, 390, 24, 1);
+        this.drawPosterText(ctx, clipText(row.text, 28), 76, y + 5, 430, 24, 1);
         y += 44;
         renderedItems += 1;
       });
@@ -552,7 +546,7 @@ Page({
 
       ctx.setFillStyle('#b2bfd3');
       ctx.setFontSize(16);
-      ctx.fillText('保存图片后，也可在“我的清单中心”继续勾选', 92, footerY);
+      ctx.fillText('保存图片后，也可在小程序中继续查看这份清单', 92, footerY);
 
       ctx.draw(false, () => {
         setTimeout(async () => {
@@ -585,17 +579,21 @@ Page({
     const customList = {
       id,
       title,
-      icon: this.data.icon || '✅',
+      icon: this.data.icon || '✓',
       category: 'custom',
       description: isTemplate
-        ? '从模板快速生成的我的清单，可继续编辑、勾选和分享。'
-        : '从已有清单复制生成，可继续编辑、勾选和分享。',
+        ? '从模板快速生成的我的清单，可继续查看和分享。'
+        : '从已有清单复制生成，可继续查看和分享。',
       groups
     };
     storage.saveCustomList(customList);
     storage.addRecent({ id, title, icon: customList.icon });
     if (isTemplate) {
-      storage.clearDraft(this.data.listId);
+      const draft = storage.getDraft(this.data.listId);
+      storage.saveDraft(this.data.listId, {
+        ...draft,
+        checkedMap: {}
+      });
       const resetGroups = normalizeGroups(this.data.originalGroups, storage.getDraft(this.data.listId));
       this.refresh(resetGroups);
     }
@@ -617,7 +615,7 @@ Page({
   },
 
   buildChecklistShareText() {
-    const lines = [`${this.data.icon || '✅'} ${this.data.title}`];
+    const lines = [`${this.data.icon || '✓'} ${this.data.title}`];
     (this.data.groups || []).forEach(group => {
       const items = group.items || [];
       if (items.length === 0) return;
