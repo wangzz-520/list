@@ -5,7 +5,6 @@
     "pages/checklist/checklist",
     "pages/today/today",
     "pages/decision/decision",
-    "pages/wallpaper/wallpaper",
     "pages/admin/admin",
     "pages/mine/mine"
   ],

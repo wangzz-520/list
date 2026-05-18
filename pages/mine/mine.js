@@ -125,10 +125,6 @@ Page({
     wx.navigateTo({ url: '/pages/decision/decision' });
   },
 
-  goWallpaper() {
-    wx.navigateTo({ url: '/pages/wallpaper/wallpaper' });
-  },
-
   goAdmin() {
     wx.navigateTo({ url: '/pages/admin/admin' });
   },

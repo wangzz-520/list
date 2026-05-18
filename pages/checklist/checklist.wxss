@@ -361,8 +361,8 @@
 .task-cell {
   display: flex;
   align-items: center;
-  min-height: 92rpx;
-  padding: 22rpx 24rpx;
+  min-height: 104rpx;
+  padding: 24rpx 24rpx;
   border-bottom: 1rpx solid #edf1f7;
 }
 
@@ -383,19 +383,29 @@
 }
 
 .checkbox {
+  position: relative;
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: 48rpx;
   height: 48rpx;
-  margin-right: 20rpx;
+  margin-right: 22rpx;
   color: #ffffff;
   background: #ffffff;
   border: 3rpx solid #c7d1e2;
   border-radius: 50%;
   box-sizing: border-box;
   box-shadow: inset 0 0 0 6rpx #f7faff;
+}
+
+.checkbox::after {
+  position: absolute;
+  top: -24rpx;
+  right: -24rpx;
+  bottom: -24rpx;
+  left: -24rpx;
+  content: "";
 }
 
 .checkbox.checked {

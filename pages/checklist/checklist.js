@@ -302,6 +302,9 @@ Page({
   },
 
   deleteItem(event) {
+    if (event && typeof event.stopPropagation === 'function') {
+      event.stopPropagation();
+    }
     const groupIndex = Number(event.currentTarget.dataset.groupIndex);
     const itemIndex = Number(event.currentTarget.dataset.itemIndex);
     const groups = clone(this.data.groups);

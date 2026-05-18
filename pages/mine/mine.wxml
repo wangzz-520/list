@@ -35,7 +35,7 @@
     </view>
     <view wx:if="{{customLists.length === 0}}" class="empty-card">
       <image class="empty-icon" src="/assets/icons/edit.svg" mode="aspectFit"></image>
-      <view class="empty-text">从模板生成或选择助手保存的清单会出现在这里</view>
+      <view class="empty-text">从模板生成的清单会出现在这里</view>
     </view>
     <view class="cell-group" wx:if="{{customLists.length > 0}}">
       <view wx:for="{{customLists}}" wx:key="id" class="list-cell">
@@ -80,23 +80,12 @@
         <text class="settings-arrow">›</text>
       </view>
       <view wx:if="{{isAdmin}}" class="cell-divider"></view>
-      <view class="settings-cell" bindtap="goWallpaper">
-        <view class="settings-left">
-          <image class="settings-icon-img" src="/assets/icons/folder.svg" mode="aspectFit"></image>
-          <view class="settings-info">
-            <view class="settings-name">壁纸下载</view>
-            <view class="settings-sub">复制网盘链接后下载</view>
-          </view>
-        </view>
-        <text class="settings-arrow">›</text>
-      </view>
-      <view class="cell-divider"></view>
       <view class="settings-cell" bindtap="goDecision">
         <view class="settings-left">
           <image class="settings-icon-img" src="/assets/icons/dice.svg" mode="aspectFit"></image>
           <view class="settings-info">
             <view class="settings-name">选择困难症助手</view>
-            <view class="settings-sub">把选择结果保存为清单</view>
+            <view class="settings-sub">帮你在多个选项里快速做决定</view>
           </view>
         </view>
         <text class="settings-arrow">›</text>
@@ -120,7 +109,7 @@
       <textarea
         class="feedback-textarea"
         value="{{feedbackText}}"
-        placeholder="例如：希望增加宠物出行清单、旅行目的地清单……"
+        placeholder="例如：希望增加旅行目的地清单、证件清单……"
         placeholder-class="input-placeholder"
         bindinput="onFeedbackInput"
         maxlength="200"

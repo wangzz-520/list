@@ -106,21 +106,18 @@
             wx:for-index="itemIndex"
             class="task-cell {{!isCustom && task.checked ? checkedCellClass : ''}}"
             hover-class="task-hover"
+            data-group-index="{{groupIndex}}"
+            data-item-index="{{itemIndex}}"
+            bindtap="toggleItem"
           >
             <view
               wx:if="{{!isCustom}}"
               class="checkbox {{task.checked ? 'checked' : ''}}"
-              data-group-index="{{groupIndex}}"
-              data-item-index="{{itemIndex}}"
-              bindtap="toggleItem"
             >
               <view wx:if="{{task.checked}}" class="check-mark"></view>
             </view>
             <view
               class="task-text {{!isCustom && task.checked ? checkedTextClass : ''}} {{isCustom ? 'readonly-task-text' : ''}}"
-              data-group-index="{{groupIndex}}"
-              data-item-index="{{itemIndex}}"
-              bindtap="toggleItem"
             >{{task.text}}</view>
             <view
               wx:if="{{!isCustom}}"
