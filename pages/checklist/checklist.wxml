@@ -1,152 +1,157 @@
 <view class="page-wrap">
-  <view class="top-card">
-    <view class="title-row">
-      <view class="big-icon">{{icon}}</view>
-      <view class="title-info">
-        <view class="checklist-title">{{title}}</view>
-        <view class="checklist-desc">{{description}}</view>
-        <view class="pin-action-row" wx:if="{{!isCustom}}">
-          <view class="pin-inline-btn" bindtap="togglePinned">
-            <text>{{isPinned ? '已加入常用' : '设为常用清单'}}</text>
+  <view wx:if="{{!loaded}}" class="loading-card">
+    <view class="loading-title">正在加载清单...</view>
+  </view>
+
+  <block wx:else>
+    <view class="top-card">
+      <view class="title-row">
+        <view class="big-icon">{{icon}}</view>
+        <view class="title-info">
+          <view class="checklist-title">{{title}}</view>
+          <view class="checklist-desc">{{description}}</view>
+          <view class="pin-action-row" wx:if="{{!isCustom}}">
+            <view class="pin-inline-btn" bindtap="togglePinned">
+              <text>{{isPinned ? '已加入常用' : '设为常用清单'}}</text>
+            </view>
           </view>
         </view>
       </view>
-    </view>
 
-    <view class="progress-wrap" wx:if="{{!isCustom}}">
-      <view class="progress-meta">
-        <text class="progress-label">{{progressLabel}}</text>
-        <text class="progress-num">{{progress.done}} / {{progress.total}}</text>
-      </view>
-      <view class="progress-track">
-        <view class="progress-fill" style="width: {{progress.percent}}%;"></view>
-      </view>
-      <view class="progress-pct">{{progress.percent}}%</view>
-    </view>
-
-  </view>
-
-  <view class="container">
-    <view class="name-card" wx:if="{{loaded && !isCustom}}">
-      <view class="name-head">
-        <view class="name-label">{{nameLabel}}</view>
-      </view>
-      <input
-        class="name-input"
-        value="{{listName}}"
-        placeholder="给这张清单取个名字"
-        placeholder-class="input-placeholder"
-        bindinput="onListNameInput"
-        bindblur="saveListName"
-        bindconfirm="saveListName"
-        confirm-type="done"
-      />
-    </view>
-
-    <view class="add-card" wx:if="{{!isCustom && !isShared}}">
-      <view class="add-label">快速添加事项</view>
-      <picker
-        wx:if="{{groupOptions.length > 0}}"
-        mode="selector"
-        range="{{groupOptions}}"
-        value="{{addGroupIndex}}"
-        bindchange="onAddGroupChange"
-      >
-        <view class="group-picker">
-          <text>添加到：{{groupOptions[addGroupIndex]}}</text>
-          <text class="picker-arrow">›</text>
+      <view class="progress-wrap" wx:if="{{!isCustom}}">
+        <view class="progress-meta">
+          <text class="progress-label">{{progressLabel}}</text>
+          <text class="progress-num">{{progress.done}} / {{progress.total}}</text>
         </view>
-      </picker>
-      <view class="add-row">
+        <view class="progress-track">
+          <view class="progress-fill" style="width: {{progress.percent}}%;"></view>
+        </view>
+        <view class="progress-pct">{{progress.percent}}%</view>
+      </view>
+    </view>
+
+    <view class="container">
+      <view class="name-card" wx:if="{{loaded && !isCustom}}">
+        <view class="name-head">
+          <view class="name-label">{{nameLabel}}</view>
+        </view>
         <input
-          class="add-input"
-          value="{{newItemText}}"
-          placeholder="例如：备用眼镜 / 车库遥控器"
+          class="name-input"
+          value="{{listName}}"
+          placeholder="给这张清单取个名字"
           placeholder-class="input-placeholder"
-          bindinput="onNewItemInput"
+          bindinput="onListNameInput"
+          bindblur="saveListName"
+          bindconfirm="saveListName"
           confirm-type="done"
-          bindconfirm="addItem"
         />
-        <button class="add-submit" bindtap="addItem">加入</button>
-      </view>
-    </view>
-
-    <view wx:if="{{isCustom}}" class="readonly-list">
-      <view wx:for="{{groups}}" wx:key="id" class="readonly-group">
-        <view class="readonly-group-title">
-          <text>{{item.name}}</text>
-          <text class="readonly-count">{{item.items.length}} 项</text>
-        </view>
-        <view wx:if="{{item.items.length === 0}}" class="readonly-empty">暂无事项</view>
-        <view wx:if="{{item.items.length > 0}}" class="readonly-grid">
-          <view wx:for="{{item.items}}" wx:for-item="task" wx:key="id" class="readonly-item">
-            <view class="readonly-text">{{task.text}}</view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <view wx:if="{{!isCustom}}" wx:for="{{groups}}" wx:key="id" wx:for-index="groupIndex" class="group-wrap">
-      <view class="group-header">
-        <text class="group-name">{{item.name}}</text>
-        <text class="group-count">{{item.items.length}} 项</text>
       </view>
 
-      <view wx:if="{{item.items.length === 0}}" class="group-empty">暂时没有事项</view>
-
-      <view class="cell-group" wx:if="{{item.items.length > 0}}">
-        <view
-          wx:for="{{item.items}}"
-          wx:for-item="task"
-          wx:key="id"
-          wx:for-index="itemIndex"
-          class="task-cell {{!isCustom && task.checked ? checkedCellClass : ''}}"
-          hover-class="task-hover"
+      <view class="add-card" wx:if="{{!isCustom && !isShared}}">
+        <view class="add-label">快速添加事项</view>
+        <picker
+          wx:if="{{groupOptions.length > 0}}"
+          mode="selector"
+          range="{{groupOptions}}"
+          value="{{addGroupIndex}}"
+          bindchange="onAddGroupChange"
         >
-          <view
-            wx:if="{{!isCustom}}"
-            class="checkbox {{task.checked ? 'checked' : ''}}"
-            data-group-index="{{groupIndex}}"
-            data-item-index="{{itemIndex}}"
-            bindtap="toggleItem"
-          >
-            <text wx:if="{{task.checked}}" class="check-mark">✓</text>
+          <view class="group-picker">
+            <text>添加到：{{groupOptions[addGroupIndex]}}</text>
+            <text class="picker-arrow">›</text>
           </view>
-          <view
-            class="task-text {{!isCustom && task.checked ? checkedTextClass : ''}} {{isCustom ? 'readonly-task-text' : ''}}"
-            data-group-index="{{groupIndex}}"
-            data-item-index="{{itemIndex}}"
-            bindtap="toggleItem"
-          >{{task.text}}</view>
-          <view
-            wx:if="{{!isCustom}}"
-            class="task-delete"
-            data-group-index="{{groupIndex}}"
-            data-item-index="{{itemIndex}}"
-            bindtap="deleteItem"
-          >删除</view>
+        </picker>
+        <view class="add-row">
+          <input
+            class="add-input"
+            value="{{newItemText}}"
+            placeholder="例如：备用眼镜 / 车库遥控器"
+            placeholder-class="input-placeholder"
+            bindinput="onNewItemInput"
+            confirm-type="done"
+            bindconfirm="addItem"
+          />
+          <button class="add-submit" bindtap="addItem">加入</button>
         </view>
       </view>
+
+      <view wx:if="{{isCustom}}" class="readonly-list">
+        <view wx:for="{{groups}}" wx:key="id" class="readonly-group">
+          <view class="readonly-group-title">
+            <text>{{item.name}}</text>
+            <text class="readonly-count">{{item.items.length}} 项</text>
+          </view>
+          <view wx:if="{{item.items.length === 0}}" class="readonly-empty">暂无事项</view>
+          <view wx:if="{{item.items.length > 0}}" class="readonly-grid">
+            <view wx:for="{{item.items}}" wx:for-item="task" wx:key="id" class="readonly-item">
+              <view class="readonly-text">{{task.text}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{!isCustom}}" wx:for="{{groups}}" wx:key="id" wx:for-index="groupIndex" class="group-wrap">
+        <view class="group-header">
+          <text class="group-name">{{item.name}}</text>
+          <text class="group-count">{{item.items.length}} 项</text>
+        </view>
+
+        <view wx:if="{{item.items.length === 0}}" class="group-empty">暂时没有事项</view>
+
+        <view class="cell-group" wx:if="{{item.items.length > 0}}">
+          <view
+            wx:for="{{item.items}}"
+            wx:for-item="task"
+            wx:key="id"
+            wx:for-index="itemIndex"
+            class="task-cell {{!isCustom && task.checked ? checkedCellClass : ''}}"
+            hover-class="task-hover"
+          >
+            <view
+              wx:if="{{!isCustom}}"
+              class="checkbox {{task.checked ? 'checked' : ''}}"
+              data-group-index="{{groupIndex}}"
+              data-item-index="{{itemIndex}}"
+              bindtap="toggleItem"
+            >
+              <view wx:if="{{task.checked}}" class="check-mark"></view>
+            </view>
+            <view
+              class="task-text {{!isCustom && task.checked ? checkedTextClass : ''}} {{isCustom ? 'readonly-task-text' : ''}}"
+              data-group-index="{{groupIndex}}"
+              data-item-index="{{itemIndex}}"
+              bindtap="toggleItem"
+            >{{task.text}}</view>
+            <view
+              wx:if="{{!isCustom}}"
+              class="task-delete"
+              data-group-index="{{groupIndex}}"
+              data-item-index="{{itemIndex}}"
+              bindtap="deleteItem"
+            >删除</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="bottom-actions">
+        <button class="reset-btn" wx:if="{{!isCustom}}" bindtap="resetChecklist">
+          <text>重置当前清单</text>
+        </button>
+        <button class="share-bottom-btn" wx:if="{{isCustom}}" open-type="share">
+          <text>分享清单</text>
+        </button>
+        <button class="copy-btn" wx:if="{{!isCustom}}" bindtap="copyChecklist" loading="{{generating}}" disabled="{{generating}}">
+          <text>{{primaryCopyText}}</text>
+        </button>
+      </view>
+
+      <view class="bottom-safe"></view>
     </view>
 
-    <view class="bottom-actions">
-      <button class="reset-btn" wx:if="{{!isCustom}}" bindtap="resetChecklist">
-        <text>重置当前清单</text>
-      </button>
-      <button class="share-bottom-btn" wx:if="{{isCustom}}" open-type="share">
-        <text>分享清单</text>
-      </button>
-      <button class="copy-btn" wx:if="{{!isCustom}}" bindtap="copyChecklist" loading="{{generating}}" disabled="{{generating}}">
-        <text>{{primaryCopyText}}</text>
-      </button>
-    </view>
-
-    <view class="bottom-safe"></view>
-  </view>
-
-  <canvas
-    class="poster-canvas"
-    canvas-id="checklistPoster"
-    style="width: 600px; height: {{posterHeight}}px;"
-  ></canvas>
+    <canvas
+      class="poster-canvas"
+      canvas-id="checklistPoster"
+      style="width: 600px; height: {{posterHeight}}px;"
+    ></canvas>
+  </block>
 </view>

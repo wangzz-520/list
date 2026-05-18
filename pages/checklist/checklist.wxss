@@ -3,6 +3,21 @@
   background: #f4f7fc;
 }
 
+.loading-card {
+  margin: 28rpx 24rpx;
+  padding: 72rpx 24rpx;
+  text-align: center;
+  background: #ffffff;
+  border: 1rpx solid #e8edf6;
+  border-radius: 18rpx;
+}
+
+.loading-title {
+  color: #75839a;
+  font-size: 29rpx;
+  font-weight: 800;
+}
+
 .top-card {
   padding: 32rpx 30rpx 30rpx;
   background: #ffffff;
@@ -45,7 +60,7 @@
 .checklist-desc {
   margin-top: 8rpx;
   color: #75839a;
-  font-size: 25rpx;
+  font-size: 27rpx;
   line-height: 1.55;
 }
 
@@ -62,13 +77,13 @@
 
 .progress-label {
   color: #4d5f7a;
-  font-size: 25rpx;
+  font-size: 27rpx;
   font-weight: 700;
 }
 
 .progress-num {
   color: #2f6fed;
-  font-size: 25rpx;
+  font-size: 27rpx;
   font-weight: 800;
 }
 
@@ -88,7 +103,7 @@
 .progress-pct {
   margin-top: 8rpx;
   color: #8793a8;
-  font-size: 22rpx;
+  font-size: 24rpx;
   text-align: right;
 }
 
@@ -117,7 +132,7 @@
 .name-label {
   min-width: 0;
   color: #4d5f7a;
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 800;
 }
 
@@ -136,7 +151,7 @@
   padding: 0 22rpx;
   margin: 0;
   color: #2f6fed;
-  font-size: 25rpx;
+  font-size: 27rpx;
   font-weight: 800;
   line-height: normal;
   background: #edf4ff;
@@ -149,7 +164,7 @@
   height: 76rpx;
   padding: 0 20rpx;
   color: #172033;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 800;
   background: #f3f6fb;
   border: 1rpx solid #e6edf7;
@@ -169,7 +184,7 @@
 .add-label {
   margin-bottom: 16rpx;
   color: #4d5f7a;
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 800;
 }
 
@@ -181,7 +196,7 @@
   padding: 0 18rpx;
   margin-bottom: 14rpx;
   color: #2f6fed;
-  font-size: 24rpx;
+  font-size: 26rpx;
   font-weight: 800;
   background: #edf4ff;
   border-radius: 12rpx;
@@ -189,7 +204,7 @@
 
 .picker-arrow {
   color: #7a99d6;
-  font-size: 32rpx;
+  font-size: 33rpx;
 }
 
 .add-row {
@@ -205,7 +220,7 @@
   height: 76rpx;
   padding: 0 20rpx;
   color: #172033;
-  font-size: 27rpx;
+  font-size: 29rpx;
   background: #f3f6fb;
   border: 1rpx solid #e6edf7;
   border-radius: 14rpx;
@@ -227,7 +242,7 @@
   padding: 0;
   margin: 0;
   color: #ffffff;
-  font-size: 24rpx;
+  font-size: 26rpx;
   font-weight: 800;
   line-height: normal;
   background: #2f6fed;
@@ -263,7 +278,7 @@
   justify-content: space-between;
   padding: 22rpx 24rpx;
   color: #172033;
-  font-size: 29rpx;
+  font-size: 31rpx;
   font-weight: 800;
   background: #f8fbff;
   border-bottom: 1rpx solid #edf1f7;
@@ -272,7 +287,7 @@
 .readonly-count {
   flex-shrink: 0;
   color: #2f6fed;
-  font-size: 23rpx;
+  font-size: 25rpx;
   font-weight: 800;
 }
 
@@ -294,7 +309,7 @@
 .readonly-text {
   overflow: hidden;
   color: #172033;
-  font-size: 26rpx;
+  font-size: 28rpx;
   line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -303,7 +318,7 @@
 .readonly-empty {
   padding: 38rpx 24rpx;
   color: #8793a8;
-  font-size: 25rpx;
+  font-size: 27rpx;
   text-align: center;
 }
 
@@ -316,19 +331,19 @@
 
 .group-name {
   color: #4d5f7a;
-  font-size: 27rpx;
+  font-size: 29rpx;
   font-weight: 800;
 }
 
 .group-count {
   color: #8793a8;
-  font-size: 23rpx;
+  font-size: 25rpx;
 }
 
 .group-empty {
   padding: 42rpx 24rpx;
   color: #8793a8;
-  font-size: 26rpx;
+  font-size: 28rpx;
   text-align: center;
   background: #ffffff;
   border: 1rpx solid #e8edf6;
@@ -372,29 +387,39 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 46rpx;
-  height: 46rpx;
+  width: 48rpx;
+  height: 48rpx;
   margin-right: 20rpx;
   color: #ffffff;
-  border: 3rpx solid #bdc8da;
+  background: #ffffff;
+  border: 3rpx solid #c7d1e2;
   border-radius: 50%;
+  box-sizing: border-box;
+  box-shadow: inset 0 0 0 6rpx #f7faff;
 }
 
 .checkbox.checked {
-  background: #2f6fed;
+  background: linear-gradient(135deg, #2f6fed, #5d92ff);
   border-color: #2f6fed;
+  box-shadow: 0 8rpx 18rpx rgba(47, 111, 237, 0.22);
 }
 
 .check-mark {
-  font-size: 26rpx;
-  font-weight: 800;
+  width: 18rpx;
+  height: 10rpx;
+  margin-top: -4rpx;
+  border-left: 5rpx solid #ffffff;
+  border-bottom: 5rpx solid #ffffff;
+  border-radius: 2rpx;
+  transform: rotate(-45deg);
+  box-sizing: border-box;
 }
 
 .task-text {
   flex: 1;
   min-width: 0;
   color: #172033;
-  font-size: 29rpx;
+  font-size: 31rpx;
   line-height: 1.5;
   word-break: break-all;
 }
@@ -412,7 +437,7 @@
   flex-shrink: 0;
   padding-left: 18rpx;
   color: #d93f3f;
-  font-size: 24rpx;
+  font-size: 26rpx;
 }
 
 .bottom-actions {
@@ -436,7 +461,7 @@
   margin: 0;
   border: none;
   border-radius: 14rpx;
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 800;
   line-height: normal;
   white-space: nowrap;

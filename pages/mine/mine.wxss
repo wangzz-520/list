@@ -40,7 +40,7 @@
 .profile-sub {
   margin-top: 8rpx;
   color: #75839a;
-  font-size: 24rpx;
+  font-size: 26rpx;
 }
 
 .stat-row {
@@ -70,7 +70,7 @@
 .stat-label {
   margin-top: 6rpx;
   color: #75839a;
-  font-size: 22rpx;
+  font-size: 24rpx;
 }
 
 .main-content {
@@ -90,7 +90,7 @@
 .group-title {
   padding: 28rpx 6rpx 14rpx;
   color: #4d5f7a;
-  font-size: 27rpx;
+  font-size: 29rpx;
   font-weight: 800;
 }
 
@@ -167,7 +167,7 @@
 .cell-title {
   overflow: hidden;
   color: #172033;
-  font-size: 29rpx;
+  font-size: 31rpx;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -177,7 +177,7 @@
   margin-top: 6rpx;
   overflow: hidden;
   color: #75839a;
-  font-size: 23rpx;
+  font-size: 25rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -186,7 +186,7 @@
   margin-top: 8rpx;
   overflow: hidden;
   color: #75839a;
-  font-size: 23rpx;
+  font-size: 25rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -209,7 +209,7 @@
   margin-left: 10rpx;
   margin-top: 10rpx;
   color: #2f6fed;
-  font-size: 24rpx;
+  font-size: 26rpx;
   background: #edf4ff;
   border-radius: 10rpx;
 }
@@ -222,14 +222,14 @@
 .text-btn.compact {
   width: 84rpx;
   min-width: 84rpx;
-  font-size: 22rpx;
+  font-size: 24rpx;
 }
 
 .mini-btn {
   width: 112rpx;
   height: 58rpx;
   color: #2f6fed;
-  font-size: 24rpx;
+  font-size: 26rpx;
   background: #edf4ff;
   border-radius: 999rpx;
 }
@@ -259,7 +259,7 @@
 .empty-text {
   margin-top: 14rpx;
   color: #8793a8;
-  font-size: 25rpx;
+  font-size: 27rpx;
   line-height: 1.45;
 }
 
@@ -269,6 +269,10 @@
   justify-content: space-between;
   min-height: 106rpx;
   padding: 24rpx 26rpx;
+}
+
+.admin-cell {
+  background: #f8fbff;
 }
 
 .share-row {
@@ -312,7 +316,7 @@
 .settings-name {
   overflow: hidden;
   color: #172033;
-  font-size: 29rpx;
+  font-size: 31rpx;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -322,7 +326,7 @@
   margin-top: 4rpx;
   overflow: hidden;
   color: #75839a;
-  font-size: 23rpx;
+  font-size: 25rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -351,7 +355,7 @@
   height: 180rpx;
   padding: 20rpx;
   color: #172033;
-  font-size: 27rpx;
+  font-size: 29rpx;
   line-height: 1.5;
   background: #f3f6fb;
   border-radius: 12rpx;
@@ -365,7 +369,7 @@
   height: 80rpx;
   margin-top: 18rpx;
   color: #ffffff;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 800;
   line-height: normal;
   background: #2f6fed;

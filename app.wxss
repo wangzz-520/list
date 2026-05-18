@@ -3,7 +3,7 @@ page {
   background: #f4f7fc;
   color: #172033;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
-  font-size: 28rpx;
+  font-size: 30rpx;
   line-height: 1.5;
   box-sizing: border-box;
 }
@@ -31,20 +31,20 @@ button {
 .section-title {
   padding: 32rpx 4rpx 16rpx;
   color: #4d5f7a;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 700;
 }
 
 .muted {
   color: #75839a;
-  font-size: 25rpx;
+  font-size: 27rpx;
 }
 
 .primary-btn,
 .secondary-btn,
 .danger-btn {
   border-radius: 16rpx;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 700;
   border: none;
 }
@@ -83,7 +83,7 @@ button {
   height: 84rpx;
   padding: 0 24rpx;
   color: #172033;
-  font-size: 28rpx;
+  font-size: 30rpx;
   background: #f3f6fb;
   border-radius: 12rpx;
 }
@@ -95,7 +95,7 @@ button {
   padding: 4rpx 14rpx;
   margin-top: 10rpx;
   color: #2f6fed;
-  font-size: 22rpx;
+  font-size: 24rpx;
   background: #edf4ff;
   border-radius: 999rpx;
 }
@@ -103,6 +103,6 @@ button {
 .empty {
   padding: 56rpx 24rpx;
   color: #8793a8;
-  font-size: 27rpx;
+  font-size: 29rpx;
   text-align: center;
 }

@@ -1,0 +1,35 @@
+<view class="page-wrap">
+  <view class="hero">
+    <view class="hero-title">壁纸下载</view>
+    <view class="hero-sub">壁纸不在小程序内展示，请复制网盘链接后到外部下载。</view>
+  </view>
+
+  <view class="container">
+    <view class="download-card">
+      <image class="download-icon" src="/assets/icons/folder.svg" mode="aspectFit"></image>
+      <view class="download-title">{{config.title}}</view>
+      <view class="download-desc">{{config.desc}}</view>
+
+      <view class="info-row">
+        <view class="info-label">网盘链接</view>
+        <view class="info-value">{{config.link || '暂未配置'}}</view>
+      </view>
+      <view class="info-row">
+        <view class="info-label">提取码</view>
+        <view class="info-value">{{config.code || '无'}}</view>
+      </view>
+
+      <view class="action-row">
+        <button class="secondary-btn" bindtap="copyCode">复制提取码</button>
+        <button class="primary-btn" bindtap="copyLink">复制链接</button>
+      </view>
+    </view>
+
+    <view class="notice-card">
+      <view class="notice-title">使用提醒</view>
+      <view class="notice-text">{{config.notice}}</view>
+    </view>
+
+    <view class="bottom-safe"></view>
+  </view>
+</view>

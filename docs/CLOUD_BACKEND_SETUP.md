@@ -1,20 +1,21 @@
 # 微信云开发接入说明
 
-本项目已经升级为“本地优先 + 微信云开发同步”架构。
+本项目采用“本地优先 + 微信云开发增强”的结构：
 
 - 不接微信支付
-- 不要求用户授权手机号、头像、昵称
-- 本地缓存仍可用
-- 云端用于模板库、用户数据同步、反馈收集、共享清单
+- 不要求手机号、头像、昵称授权
+- 不引入传统服务器
+- 本地缓存始终可用
+- 云端用于模板库、用户数据同步、反馈收集、管理员反馈查看和共享清单快照
 
-## 1. 需要准备什么
+## 1. 准备
 
-1. 一个已注册的小程序 AppID。
+1. 一个已认证或可发布的小程序 AppID。
 2. 微信开发者工具。
-3. 在微信开发者工具中开通“云开发”环境。
-4. 一个云环境 ID，例如：`prod-xxxxx`。
+3. 在微信开发者工具中开通云开发环境。
+4. 一个云环境 ID，例如 `prod-xxxxx`。
 
-## 2. 修改云环境 ID
+## 2. 配置云环境 ID
 
 打开：
 
@@ -22,7 +23,7 @@
 config/cloud.js
 ```
 
-修改：
+配置：
 
 ```js
 const CLOUD_ENV_ID = '你的云环境ID';
@@ -31,110 +32,64 @@ const ENABLE_CLOUD = true;
 
 如果 `CLOUD_ENV_ID` 留空，代码会尝试使用微信开发者工具当前默认云环境。
 
-## 3. 项目目录变化
+## 3. 云函数目录
 
 ```text
 cloudfunctions/
-├─ login/             获取 openid
-├─ initDatabase/      初始化云数据库集合
-├─ initTemplates/     初始化 20 个内置模板到云数据库
+├─ login/             获取 openid，并写入或更新 user_data 登录记录
+├─ adminManager/      管理员身份、反馈查看
+├─ initDatabase/      一站式创建集合、配置和模板数据
+├─ initTemplates/     兼容保留：单独刷新模板数据
 ├─ getTemplates/      云端模板查询
-├─ syncUserData/      收藏、最近使用、自定义清单、勾选进度同步
+├─ syncUserData/      用户私有数据同步
 ├─ submitFeedback/    用户反馈提交
-└─ createShareList/   创建共享清单快照
-
-config/
-└─ cloud.js           云开发开关和环境 ID
-
-utils/
-├─ cloudApi.js        小程序端云函数封装
-├─ cloudSync.js       用户数据同步封装
-├─ storage.js         本地缓存 + 云同步触发
-└─ checklist.js       清单进度计算
+└─ createShareList/   创建和读取共享清单快照
 ```
 
 ## 4. 云数据库集合
 
-建议在云开发控制台创建以下集合：
+`initDatabase` 会创建：
 
 ```text
 checklist_templates   清单模板库
-app_config            应用配置，例如分类配置
-user_data             用户收藏、勾选进度、自定义清单
+app_config            应用配置，例如分类、管理员 openid
+user_data             用户私有数据
 feedbacks             用户反馈
 shared_lists          共享清单快照
 ```
 
-也可以先不手动创建，部分集合会在云函数首次写入时自动创建，但上线前建议你在控制台确认集合和权限。
+如果云函数没有创建集合权限，请在云开发控制台手动创建以上 5 个集合后，再调用 `initDatabase`。
 
 ## 5. 数据库权限建议
 
-本项目默认通过云函数访问数据库，前端不直接读写数据库。因此建议：
+本项目默认通过云函数访问数据库，前端不直接读写数据库。建议：
 
 ```text
-checklist_templates：仅云函数可写；如果未来前端直读，可设置所有用户可读
+checklist_templates：仅云函数可写；如未来前端直读，可设置所有用户可读
 app_config：仅云函数可写；如需前端直读，可设置所有用户可读
-user_data：仅云函数读写
-feedbacks：仅云函数写入和管理
-shared_lists：仅云函数读写；分享访问通过 `createShareList` 云函数按 `shareId` 读取 active 快照
+user_data：仅云函数读写，并按 _openid 隔离
+feedbacks：仅云函数写入和管理员读取
+shared_lists：仅云函数读写；读取分享时不返回 _openid
 ```
 
 ## 6. 部署云函数
 
-在微信开发者工具中：
+在微信开发者工具中右键以下目录，选择“上传并部署：云端安装依赖”：
 
 ```text
-cloudfunctions/login             右键 → 上传并部署：云端安装依赖
-cloudfunctions/initDatabase      右键 → 上传并部署：云端安装依赖
-cloudfunctions/initTemplates     右键 → 上传并部署：云端安装依赖
-cloudfunctions/getTemplates      右键 → 上传并部署：云端安装依赖
-cloudfunctions/syncUserData      右键 → 上传并部署：云端安装依赖
-cloudfunctions/submitFeedback    右键 → 上传并部署：云端安装依赖
-cloudfunctions/createShareList   右键 → 上传并部署：云端安装依赖
+cloudfunctions/login
+cloudfunctions/adminManager
+cloudfunctions/initDatabase
+cloudfunctions/initTemplates
+cloudfunctions/getTemplates
+cloudfunctions/syncUserData
+cloudfunctions/submitFeedback
+cloudfunctions/createShareList
 ```
 
-`createShareList` 同时负责：
+## 7. 初始化集合和基础数据
 
-```text
-operation 默认/create：创建共享清单快照
-operation=get：按 shareId 读取 active 共享清单快照
-```
-
-## 7. 初始化数据库集合
-
-部署 `initDatabase` 后，在微信开发者工具的云函数面板里测试调用：
-
-```json
-{}
-```
-
-成功后会返回每个集合的状态：
-
-```json
-{
-  "ok": true,
-  "total": 5,
-  "created": 5,
-  "existed": 0,
-  "failed": 0
-}
-```
-
-它会创建：
-
-```text
-checklist_templates
-app_config
-user_data
-feedbacks
-shared_lists
-```
-
-如果你的云环境不允许云函数创建集合，返回中会列出失败原因；这种情况下请在云开发控制台手动创建以上 5 个集合。
-
-## 8. 初始化模板数据
-
-部署 `initTemplates` 后，在微信开发者工具的云函数面板里测试调用：
+部署 `initDatabase` 后，在云函数测试面板调用：
 
 ```json
 {}
@@ -145,73 +100,65 @@ shared_lists
 ```json
 {
   "ok": true,
-  "total": 20,
-  "created": 20,
-  "updated": 0,
-  "categories": 7
+  "total": 5,
+  "created": 5,
+  "existed": 0,
+  "failed": 0,
+  "seeded": true,
+  "templates": {
+    "total": 25,
+    "created": 25,
+    "updated": 0
+  },
+  "categories": 8
 }
 ```
 
-此时 `checklist_templates` 集合中会写入 20 个模板。
-
-## 9. 小程序端如何工作
-
-### 没有云环境时
-
-小程序仍然使用：
+它会初始化：
 
 ```text
-data/templates.js
-wx.setStorageSync / wx.getStorageSync
+checklist_templates   内置模板
+app_config            categories 分类配置
+app_config            admin_openids 管理员白名单占位，默认 []
 ```
 
-用户可以正常查看、勾选、收藏、新建自定义清单。
-
-### 配置云环境并部署云函数后
-
-小程序会自动启用：
-
-```text
-云端模板查询
-云端用户数据同步
-云端反馈收集
-云端共享清单快照
-```
-
-本地缓存仍然保留，网络异常时不会影响基础使用。
-
-## 10. 云端同步字段
-
-`user_data` 中保存的数据结构：
+如果云函数测试面板出现 `Invoking task timed out after 3 seconds`，先确认已重新上传部署 `cloudfunctions/initDatabase`，因为现在已增加 `config.json` 超时配置。仍然超时时，可以分步调用：
 
 ```json
-{
-  "_openid": "用户openid",
-  "data": {
-    "schemaVersion": 1,
-    "drafts": {},
-    "favorites": [],
-    "pinnedTemplates": [],
-    "recents": [],
-    "completedLists": [],
-    "customLists": [],
-    "feedbacks": [],
-    "clientExportedAt": 1710000000000
-  },
-  "appid": "小程序appid",
-  "unionid": "用户unionid，没有则为空",
-  "lastLoginAt": "serverDate",
-  "createdAt": "serverDate",
-  "updatedAt": "serverDate"
-}
+{ "operation": "collections" }
 ```
 
-用户进入小程序后，`login` 云函数会按 `_openid` 在 `user_data` 中创建或更新登录记录；已有 `data` 不会被覆盖。
-
-## 11. Codex 继续开发建议
-
-接下来可以让 Codex 执行：
-
-```text
-请阅读 docs/CLOUD_BACKEND_SETUP.md、config/cloud.js、utils/cloudApi.js、utils/cloudSync.js 和 cloudfunctions 目录。检查微信云开发接入是否完整，然后输出 docs/cloud_backend_test_report.md。不要接微信支付，不要引入传统服务器。
+```json
+{ "operation": "config" }
 ```
+
+```json
+{ "operation": "templates", "offset": 0, "limit": 10 }
+```
+
+然后按返回的 `nextOffset` 继续调用，例如：
+
+```json
+{ "operation": "templates", "offset": 10, "limit": 10 }
+```
+
+直到 `hasMore` 为 `false`。
+
+## 8. 共享清单快照流程
+
+1. 用户在已生成清单页点击“分享清单”。
+2. 前端调用 `createShareList` 云函数，把当前清单内容写入 `shared_lists`。
+3. 云函数返回 `shareId`。
+4. 分享路径变为 `/pages/checklist/checklist?shareId=xxx`。
+5. 接收方打开后通过 `createShareList` 的 `operation: "get"` 读取快照。
+
+说明：共享清单是固定快照，不是多人实时协作。创建者后续修改本地清单，不会自动改变已经分享出去的内容。
+
+## 9. 本地降级
+
+未配置云环境、未部署云函数或云函数调用失败时：
+
+- 首页、分类页仍使用 `data/templates.js`
+- 勾选、常用、最近生成、自定义清单仍使用本地缓存
+- 反馈先保存本地，再尝试云端提交
+- 分享清单会退回普通页面路径，云端快照不可用

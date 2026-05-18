@@ -2,24 +2,23 @@
 
 ## 检查结论
 
-当前项目已具备“本地优先 + 微信云开发同步”的接入结构。小程序端在云开发不可用时会回退到本地模板和本地缓存；云开发可用并部署云函数后，可使用云端模板、用户数据同步、反馈收集和共享清单快照。
+当前项目具备“本地优先 + 微信云开发增强”的接入结构。云开发可用时支持云端模板、用户数据同步、反馈收集、管理员反馈查看和共享清单快照；云开发不可用时，首页、分类、清单详情和我的页面核心功能仍可本地运行。
 
-需要注意：`project.config.json` 已配置小程序 AppID。接入云开发前，需要确认该 AppID 是当前微信开发者工具登录账号有权限管理的小程序，并在云开发控制台开通环境。
+本次新增并修复了“共享清单快照云端能力”：分享清单时创建 `shared_lists` 快照，分享路径携带 `shareId`，接收方可通过云函数读取固定快照。
 
 ## 1. 云开发初始化
 
-- `app.js` 会读取 `config/cloud.js`。
+- `app.js` 读取 `config/cloud.js`。
 - `ENABLE_CLOUD = true` 时尝试调用 `wx.cloud.init()`。
-- `CLOUD_ENV_ID` 为空时，使用微信开发者工具当前默认云环境。
-- 当前为测试号或未配置真实 AppID 时，`app.js` 会跳过云初始化并自动降级为本地模式。
-- `wx.cloud` 不存在或初始化失败时，会保持 `globalData.cloudReady = false`，并降级为本地模式。
-- 初始化成功后，会调用 `cloudSync.pullAndMerge()` 拉取云端用户数据并合并到本地缓存。
+- `CLOUD_ENV_ID` 为空时使用开发者工具默认云环境。
+- `wx.cloud` 不存在或初始化失败时，保持 `globalData.cloudReady = false` 并降级为本地模式。
+- 初始化成功后会尝试调用 `cloudSync.pullAndMerge()` 拉取用户数据。
 
 结论：初始化逻辑正确，具备失败降级能力。
 
 ## 2. cloudfunctionRoot
 
-`project.config.json` 配置如下：
+`project.config.json` 已配置：
 
 ```json
 {
@@ -30,11 +29,12 @@
 
 结论：云函数根目录配置正确。
 
-## 3. 云函数清单与依赖
+## 3. 云函数与依赖
 
-已检查 7 个云函数目录，均包含 `index.js` 和 `package.json`：
+需要部署的核心云函数：
 
 - `login`
+- `adminManager`
 - `initDatabase`
 - `initTemplates`
 - `getTemplates`
@@ -42,71 +42,70 @@
 - `submitFeedback`
 - `createShareList`
 
-每个 `package.json` 均包含 `wx-server-sdk` 依赖。已执行 Node 语法检查，云函数 JS 均通过。
+每个核心云函数均包含 `index.js` 和 `package.json`，并依赖 `wx-server-sdk`。
 
-## 4. 云函数与前端调用名称
-
-前端调用与云函数目录匹配：
+## 4. 前端调用名称
 
 | 前端位置 | 调用名称 | 云函数 |
 | --- | --- | --- |
+| `utils/cloudApi.js` | `login` | `cloudfunctions/login` |
 | `utils/cloudApi.js` | `getTemplates` | `cloudfunctions/getTemplates` |
 | `utils/cloudSync.js` | `syncUserData` | `cloudfunctions/syncUserData` |
 | `utils/storage.js` | `syncUserData` | `cloudfunctions/syncUserData` |
 | `utils/cloudApi.js` | `submitFeedback` | `cloudfunctions/submitFeedback` |
+| `utils/cloudApi.js` | `adminManager` | `cloudfunctions/adminManager` |
 | `utils/cloudApi.js` | `createShareList` | `cloudfunctions/createShareList` |
-| `utils/cloudApi.js` | `login` | `cloudfunctions/login` |
 
-`initDatabase` 和 `initTemplates` 是部署/初始化辅助函数，需在微信开发者工具中手动调用。
+结论：前端调用名称与云函数目录一致。
 
 ## 5. 页面云端数据调用
 
-- 首页：先加载 `data/templates.js` 本地热门模板，再调用 `cloudApi.getTemplates({ sortByHot: true })` 覆盖为云端热门模板。
-- 分类页：先按本地分类模板展示，再调用 `cloudApi.getTemplates({ category })` 覆盖为云端分类模板。
-- 我的页：使用本地缓存展示最近生成清单、常用清单和同步状态；反馈提交会先写本地，再尝试调用 `submitFeedback`；用户数据变更后会通过 `syncUserData` 自动同步。
-
-结论：首页、分类页、我的页均保留本地优先，并在云开发可用时调用云端能力。
+- 首页：本地模板优先，再用 `cloudApi.getTemplates({ sortByHot: true })` 覆盖云端热门模板。
+- 分类页：本地分类模板优先，再用 `cloudApi.getTemplates({ category })` 覆盖云端分类模板。
+- 我的页：展示本地最近生成、常用清单和同步状态；反馈通过 `submitFeedback` 提交；用户数据通过 `syncUserData` 同步。
+- 清单详情页：模板从本地和云端模板读取；已生成清单分享时调用 `createShareList` 创建云端快照；通过 `shareId` 打开时调用 `createShareList` 读取快照。
 
 ## 6. 本地降级能力
 
 未配置云环境、未部署云函数或云函数调用失败时：
 
-- `cloudApi.callFunction()` 返回 `{ ok: false, reason: 'cloud_not_ready' }` 或 `{ ok: false, reason: 'call_failed' }`。
-- 首页、分类页仍使用 `data/templates.js`。
-- 勾选、收藏、最近使用、自定义清单仍使用 `utils/storage.js` 的本地缓存。
-- 反馈会先保存到本地，再尝试云端提交。
+- `cloudApi.callFunction()` 返回 `{ ok: false, reason: "cloud_not_ready" }` 或 `{ ok: false, reason: "call_failed" }`。
+- 首页、分类页继续使用 `data/templates.js`。
+- 勾选、常用、最近生成、自定义清单继续使用 `utils/storage.js`。
+- 分享清单退回普通页面路径，云端快照不可用。
 
 结论：核心功能可降级为本地模式。
 
-## 7. 已修复问题
+## 7. 本次修复
 
-- 为 `initTemplates`、`syncUserData`、`submitFeedback`、`createShareList` 补充异常捕获，确保失败时也返回 `ok: false`。
-- 为 `submitFeedback`、`createShareList` 增加 `_openid` 检查，避免私有数据写入时缺少用户隔离字段。
-- 替换前端和云函数中的 `flatMap` 用法，降低微信开发者工具和云函数运行环境兼容风险。
+- 修复 `createShareList` 云函数，支持创建和读取共享清单快照。
+- `createShareList` 写入 `shared_lists` 时按 `_openid` 记录创建者，并限制分组、事项数量和文本长度。
+- `createShareList` 读取快照时不返回 `_openid`。
+- `initDatabase` 增加 `shared_lists` 集合创建。
+- `initDatabase` 增加 20 秒超时配置，并支持 `collections`、`config`、`templates` 分步初始化，避免测试面板 3 秒超时。
+- 清单详情页分享逻辑改为先创建 `shareId`，再分享 `/pages/checklist/checklist?shareId=...`。
+- 更新 `docs/DB_SCHEMA.md`、`docs/CLOUD_BACKEND_SETUP.md` 和 `docs/CLOUD_DEPLOY_CHECKLIST.md`。
 
 ## 8. 静态验证结果
 
 已执行：
 
 ```text
-app.json / project.config.json / sitemap.json / pages/*.json JSON 解析检查
-app.js / utils/*.js / data/templates.js 语法检查
-pages/**/*.js 语法检查
-cloudfunctions/**/*.js 语法检查
-cloudfunctions/*/package.json 依赖检查
+node --check pages/checklist/checklist.js
+node --check cloudfunctions/createShareList/index.js
+node --check cloudfunctions/initDatabase/index.js
 ```
 
 结果：通过。
 
-## 9. 部署前必做
+## 9. 部署后手工验证
 
-1. 在微信开发者工具中确认 `project.config.json` 的 `appid` 是你有权限管理的小程序 AppID。
-2. 在微信开发者工具中开通云开发环境。
-3. 如需指定环境，将 `config/cloud.js` 的 `CLOUD_ENV_ID` 填为云环境 ID；不填写则使用开发者工具当前默认云环境。
-4. 依次上传并部署 7 个云函数，选择“云端安装依赖”。
-5. 先调用 `initDatabase` 创建集合，再调用 `initTemplates` 初始化 `checklist_templates` 和 `app_config`。
-6. 在首页、分类页、我的页验证云端读取、反馈提交和用户数据同步。
+1. 上传并部署 `initDatabase` 和 `createShareList`。
+2. 调用 `initDatabase`，确认返回 `total: 5`，并确认 `shared_lists` 集合存在。
+3. 从“我的”页最近生成清单进入已生成清单详情。
+4. 点击“分享清单”，确认 `shared_lists` 新增一条快照。
+5. 用分享卡片打开，确认进入 `shareId` 路径并显示正确清单。
 
 ## 10. 合规边界
 
-本次检查和修复未接入微信支付，未强制手机号授权，未引入传统服务器，未引入前端 npm 依赖。
+本次未接入微信支付，未强制手机号授权，未引入传统服务器，未引入前端 npm 依赖。

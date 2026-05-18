@@ -72,6 +72,23 @@ async function getTemplateById(id) {
   return rows[0] || null;
 }
 
+async function getAdminState() {
+  const result = await callFunction('adminManager', { operation: 'state' });
+  return {
+    ok: !!(result && result.ok),
+    isAdmin: !!(result && result.isAdmin)
+  };
+}
+
+async function getAdminFeedbacks(params = {}) {
+  const result = await callFunction('adminManager', {
+    operation: 'listFeedbacks',
+    limit: params.limit || 50
+  });
+  if (!result || result.ok === false) return [];
+  return result.data || [];
+}
+
 async function submitFeedback(content, meta = {}) {
   const text = String(content || '').trim();
   if (!text) return { ok: false, reason: 'empty_content' };
@@ -96,6 +113,8 @@ module.exports = {
   login,
   getTemplates,
   getTemplateById,
+  getAdminState,
+  getAdminFeedbacks,
   submitFeedback,
   createShareList,
   getShareList

@@ -31,13 +31,13 @@
 
 .tab-icon {
   margin-bottom: 6rpx;
-  font-size: 30rpx;
+  font-size: 31rpx;
 }
 
 .tab-text {
   padding-bottom: 18rpx;
   color: #697892;
-  font-size: 25rpx;
+  font-size: 27rpx;
 }
 
 .tab-item.active .tab-text {
@@ -79,14 +79,14 @@
 
 .cat-header-name {
   color: #172033;
-  font-size: 34rpx;
+  font-size: 35rpx;
   font-weight: 800;
 }
 
 .cat-header-desc {
   margin-top: 6rpx;
   color: #75839a;
-  font-size: 25rpx;
+  font-size: 27rpx;
   line-height: 1.5;
 }
 
@@ -140,7 +140,7 @@
 .cell-title {
   overflow: hidden;
   color: #172033;
-  font-size: 30rpx;
+  font-size: 31rpx;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -150,7 +150,7 @@
   margin-top: 6rpx;
   overflow: hidden;
   color: #75839a;
-  font-size: 24rpx;
+  font-size: 26rpx;
   line-height: 1.45;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -177,7 +177,7 @@
 .empty-text {
   margin-top: 14rpx;
   color: #8793a8;
-  font-size: 27rpx;
+  font-size: 29rpx;
 }
 
 .bottom-safe {

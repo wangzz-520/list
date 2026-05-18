@@ -16,25 +16,32 @@
 - [ ] 部署 `getTemplates`
 - [ ] 部署 `syncUserData`
 - [ ] 部署 `submitFeedback`
+- [ ] 部署 `adminManager`
 - [ ] 部署 `createShareList`
 
 ## 数据初始化
 
 - [ ] 调用 `initDatabase`
-- [ ] 检查 5 个集合已创建
-- [ ] 调用 `initTemplates`
-- [ ] 检查 `checklist_templates` 有 25 条模板数据
-- [ ] 检查 `app_config` 有 categories 配置
+- [ ] 如果 `initDatabase` 超时，改用 `operation: "collections"`、`operation: "config"`、`operation: "templates"` 分步初始化
+- [ ] 检查 5 个集合已创建：`checklist_templates`、`app_config`、`user_data`、`feedbacks`、`shared_lists`
+- [ ] 检查 `initDatabase` 返回 `seeded: true`
+- [ ] 检查 `checklist_templates` 有模板数据
+- [ ] 检查 `app_config` 有 `categories` 配置
+- [ ] 检查 `app_config` 有 `admin_openids` 配置
+- [ ] 在 `app_config` 的 `admin_openids.value` 中加入管理员 openid
 
 ## 小程序测试
 
 - [ ] 首页能显示热门清单
 - [ ] 分类页能显示云端模板
-- [ ] 清单详情能正常勾选
+- [ ] 清单详情能正常勾选、添加事项和生成我的清单
+- [ ] 生成后的清单能在“我的”页最近生成中看到
+- [ ] 已生成清单点击“分享清单”后，`shared_lists` 集合新增快照
+- [ ] 分享卡片打开后进入 `/pages/checklist/checklist?shareId=...` 并显示对应清单
 - [ ] 常用清单设置后重新打开仍保留
-- [ ] 生成我的清单后能在“我的”页最近生成中看到
-- [ ] 最近生成清单进入后为只读展示
-- [ ] 分享清单能生成共享快照
+- [ ] 管理员账号能看到“管理员中心”
+- [ ] 普通用户看不到“管理员中心”
+- [ ] 管理员可查看用户反馈
 - [ ] 提交反馈后 `feedbacks` 集合有记录
 - [ ] 未配置云环境时仍可本地运行
 

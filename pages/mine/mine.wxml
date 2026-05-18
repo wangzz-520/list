@@ -69,6 +69,28 @@
 
     <view class="group-title">工具与数据</view>
     <view class="settings-group">
+      <view wx:if="{{isAdmin}}" class="settings-cell admin-cell" bindtap="goAdmin">
+        <view class="settings-left">
+          <image class="settings-icon-img" src="/assets/icons/cloud.svg" mode="aspectFit"></image>
+          <view class="settings-info">
+            <view class="settings-name">管理员中心</view>
+            <view class="settings-sub">查看用户建议</view>
+          </view>
+        </view>
+        <text class="settings-arrow">›</text>
+      </view>
+      <view wx:if="{{isAdmin}}" class="cell-divider"></view>
+      <view class="settings-cell" bindtap="goWallpaper">
+        <view class="settings-left">
+          <image class="settings-icon-img" src="/assets/icons/folder.svg" mode="aspectFit"></image>
+          <view class="settings-info">
+            <view class="settings-name">壁纸下载</view>
+            <view class="settings-sub">复制网盘链接后下载</view>
+          </view>
+        </view>
+        <text class="settings-arrow">›</text>
+      </view>
+      <view class="cell-divider"></view>
       <view class="settings-cell" bindtap="goDecision">
         <view class="settings-left">
           <image class="settings-icon-img" src="/assets/icons/dice.svg" mode="aspectFit"></image>

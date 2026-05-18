@@ -123,7 +123,7 @@
   - `user_data`
   - `feedbacks`
   - `shared_lists`
-- 调用 `initTemplates` 后，确认 `checklist_templates` 有 25 条模板数据。
+- 调用 `initDatabase` 后，确认 `checklist_templates` 有 25 条模板数据。
 - 登录小程序后，确认 `user_data` 中有当前用户记录。
 - 生成清单后，等待同步，再确认 `user_data.data.customLists` 有对应清单。
 - 提交反馈后，确认 `feedbacks` 集合有记录。

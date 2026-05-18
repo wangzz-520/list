@@ -62,7 +62,8 @@ Page({
     cloudEnabled: false,
     syncStatusText: '本地模式',
     syncDesc: '当前使用本地缓存',
-    lastSyncText: '尚未同步'
+    lastSyncText: '尚未同步',
+    isAdmin: false
   },
 
   onShow() {
@@ -100,6 +101,14 @@ Page({
         : '当前使用本地缓存，配置云环境后可同步',
       lastSyncText: cloudEnabled ? formatTime(lastSyncAt) : '未启用云同步'
     });
+
+    if (cloudEnabled) {
+      cloudApi.getAdminState().then(result => {
+        this.setData({ isAdmin: !!(result && result.isAdmin) });
+      });
+    } else {
+      this.setData({ isAdmin: false });
+    }
   },
 
   goChecklist(event) {
@@ -114,6 +123,14 @@ Page({
 
   goDecision() {
     wx.navigateTo({ url: '/pages/decision/decision' });
+  },
+
+  goWallpaper() {
+    wx.navigateTo({ url: '/pages/wallpaper/wallpaper' });
+  },
+
+  goAdmin() {
+    wx.navigateTo({ url: '/pages/admin/admin' });
   },
 
   copyList(event) {

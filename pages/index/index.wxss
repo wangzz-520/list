@@ -32,7 +32,7 @@
 
 .brand-name {
   color: #172033;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 800;
   line-height: 1.25;
 }
@@ -40,7 +40,7 @@
 .brand-desc {
   margin-top: 4rpx;
   color: #75839a;
-  font-size: 22rpx;
+  font-size: 24rpx;
 }
 
 .banner-title {
@@ -53,7 +53,7 @@
 .banner-sub {
   margin-top: 14rpx;
   color: #64748b;
-  font-size: 25rpx;
+  font-size: 27rpx;
   line-height: 1.62;
 }
 
@@ -122,7 +122,7 @@
 .action-title {
   overflow: hidden;
   color: #172033;
-  font-size: 30rpx;
+  font-size: 31rpx;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -132,7 +132,7 @@
   margin-top: 6rpx;
   overflow: hidden;
   color: #75839a;
-  font-size: 23rpx;
+  font-size: 25rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -147,7 +147,7 @@
 .section-title {
   padding: 30rpx 4rpx 14rpx;
   color: #4d5f7a;
-  font-size: 27rpx;
+  font-size: 29rpx;
   font-weight: 800;
 }
 
@@ -183,7 +183,7 @@
   margin-top: 10rpx;
   overflow: hidden;
   color: #172033;
-  font-size: 23rpx;
+  font-size: 25rpx;
   font-weight: 800;
   line-height: 1.35;
   word-break: break-all;
@@ -232,7 +232,7 @@
   width: 70rpx;
   height: 70rpx;
   margin-right: 18rpx;
-  font-size: 34rpx;
+  font-size: 35rpx;
   background: #ffffff;
   border: 1rpx solid #dbe8ff;
   border-radius: 14rpx;
@@ -256,12 +256,12 @@
 }
 
 .template-section-title {
-  font-size: 30rpx;
+  font-size: 31rpx;
 }
 
 .template-mini-title,
 .cell-title {
-  font-size: 28rpx;
+  font-size: 30rpx;
 }
 
 .template-section-desc,
@@ -270,7 +270,7 @@
   margin-top: 6rpx;
   overflow: hidden;
   color: #75839a;
-  font-size: 23rpx;
+  font-size: 25rpx;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -298,7 +298,7 @@
   width: 64rpx;
   height: 64rpx;
   margin-right: 18rpx;
-  font-size: 32rpx;
+  font-size: 33rpx;
   background: #f3f6fb;
   border-radius: 12rpx;
 }
@@ -313,7 +313,7 @@
   flex-shrink: 0;
   padding: 5rpx 10rpx;
   color: #19a974;
-  font-size: 20rpx;
+  font-size: 24rpx;
   font-weight: 800;
   background: #ecfdf5;
   border-radius: 999rpx;
@@ -344,7 +344,7 @@
 .empty-text {
   margin-top: 14rpx;
   color: #8793a8;
-  font-size: 27rpx;
+  font-size: 29rpx;
 }
 
 .bottom-safe {

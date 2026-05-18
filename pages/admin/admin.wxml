@@ -1,0 +1,37 @@
+<view class="page-wrap">
+  <view class="hero">
+    <view class="hero-title">管理员中心</view>
+    <view class="hero-sub">仅管理员可见，用于查看用户建议。</view>
+  </view>
+
+  <view class="container">
+    <view wx:if="{{checking}}" class="empty-card">
+      <view class="empty-text">正在确认管理员身份...</view>
+    </view>
+
+    <view wx:elif="{{!isAdmin}}" class="empty-card">
+      <image class="empty-icon" src="/assets/icons/empty.svg" mode="aspectFit"></image>
+      <view class="empty-text">暂无管理员权限</view>
+      <view class="empty-sub">请先在 app_config 中配置当前 openid</view>
+    </view>
+
+    <block wx:else>
+      <view class="section-row">
+        <view class="section-title">用户建议</view>
+        <button class="refresh-btn" bindtap="loadFeedbacks" loading="{{feedbackLoading}}">刷新</button>
+      </view>
+
+      <view wx:if="{{feedbacks.length === 0}}" class="empty-card compact">
+        <view class="empty-text">暂无用户建议</view>
+      </view>
+      <view wx:else class="feedback-list">
+        <view wx:for="{{feedbacks}}" wx:key="id" class="feedback-item">
+          <view class="feedback-content">{{item.content}}</view>
+          <view class="feedback-meta">{{item.timeText}} · {{item.status}}</view>
+        </view>
+      </view>
+    </block>
+
+    <view class="bottom-safe"></view>
+  </view>
+</view>

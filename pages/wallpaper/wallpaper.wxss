@@ -1,0 +1,147 @@
+.page-wrap {
+  min-height: 100vh;
+  background: #f4f7fc;
+}
+
+.hero {
+  padding: 42rpx 30rpx 72rpx;
+  color: #172033;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8fd 100%);
+}
+
+.hero-title {
+  color: #172033;
+  font-size: 40rpx;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.hero-sub {
+  margin-top: 12rpx;
+  color: #75839a;
+  font-size: 26rpx;
+  line-height: 1.55;
+}
+
+.container {
+  min-height: 72vh;
+  padding: 0 24rpx 48rpx;
+  margin-top: -34rpx;
+  background: #f4f7fc;
+  border-radius: 28rpx 28rpx 0 0;
+}
+
+.download-card,
+.notice-card {
+  padding: 30rpx 26rpx;
+  background: #ffffff;
+  border: 1rpx solid #e8edf6;
+  border-radius: 18rpx;
+  box-shadow: 0 12rpx 30rpx rgba(42, 61, 102, 0.06);
+}
+
+.download-card {
+  text-align: center;
+}
+
+.download-icon {
+  width: 92rpx;
+  height: 92rpx;
+  padding: 18rpx;
+  background: #edf4ff;
+  border-radius: 24rpx;
+}
+
+.download-title {
+  margin-top: 20rpx;
+  color: #172033;
+  font-size: 35rpx;
+  font-weight: 800;
+}
+
+.download-desc {
+  margin-top: 12rpx;
+  color: #75839a;
+  font-size: 27rpx;
+  line-height: 1.55;
+}
+
+.info-row {
+  margin-top: 22rpx;
+  padding: 18rpx 20rpx;
+  text-align: left;
+  background: #f5f8fd;
+  border-radius: 14rpx;
+}
+
+.info-label {
+  color: #4d5f7a;
+  font-size: 25rpx;
+  font-weight: 800;
+}
+
+.info-value {
+  margin-top: 8rpx;
+  color: #172033;
+  font-size: 27rpx;
+  line-height: 1.45;
+  word-break: break-all;
+}
+
+.action-row {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 26rpx;
+}
+
+.primary-btn,
+.secondary-btn {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  height: 78rpx;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 14rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.primary-btn {
+  color: #ffffff;
+  background: #2f6fed;
+}
+
+.secondary-btn {
+  color: #2f6fed;
+  background: #edf4ff;
+}
+
+.primary-btn::after,
+.secondary-btn::after {
+  border: none;
+}
+
+.notice-card {
+  margin-top: 22rpx;
+}
+
+.notice-title {
+  color: #4d5f7a;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.notice-text {
+  margin-top: 10rpx;
+  color: #75839a;
+  font-size: 26rpx;
+  line-height: 1.55;
+}
+
+.bottom-safe {
+  height: 40rpx;
+}

@@ -1,6 +1,7 @@
 const { findTemplateById } = require('../../data/templates');
 const storage = require('../../utils/storage');
 const cloudApi = require('../../utils/cloudApi');
+const cloudSync = require('../../utils/cloudSync');
 const { normalizeGroups, calcProgress, clone } = require('../../utils/checklist');
 
 function leaveInvalidPage() {
@@ -595,6 +596,11 @@ Page({
       const resetGroups = normalizeGroups(this.data.originalGroups, storage.getDraft(this.data.listId));
       this.refresh(resetGroups);
     }
+    const syncResult = await cloudSync.saveCustomListNow(customList);
+    if (!syncResult || syncResult.ok === false) {
+      console.warn('custom checklist cloud sync skipped or failed:', syncResult);
+      await cloudSync.pushNow();
+    }
     const savedImage = await this.saveChecklistImage(customList);
     this.setData({ generating: false });
     wx.showToast({
@@ -607,40 +613,68 @@ Page({
     }, 300);
   },
 
+  buildChecklistShareText() {
+    const lines = [`${this.data.icon || '✅'} ${this.data.title}`];
+    (this.data.groups || []).forEach(group => {
+      const items = group.items || [];
+      if (items.length === 0) return;
+      lines.push('', `【${group.name || '清单分组'}】`);
+      items.forEach(item => {
+        lines.push(`- ${typeof item === 'string' ? item : item.text}`);
+      });
+    });
+    lines.push('', '来自：万能生活清单助手');
+    return lines.join('\n');
+  },
+
+  copyChecklistText() {
+    wx.setClipboardData({
+      data: this.buildChecklistShareText(),
+      success: () => {
+        wx.showToast({ title: '清单内容已复制', icon: 'success' });
+      }
+    });
+  },
+
   async createCloudShare() {
-    if (this.data.shareId) {
-      return this.data.shareId;
-    }
+    if (this.data.shareId) return this.data.shareId;
+    if (!cloudApi.isCloudReady()) return '';
+
     const result = await cloudApi.createShareList({
       sourceId: this.data.listId,
       title: this.data.title,
       icon: this.data.icon,
+      description: this.data.description,
       groups: this.data.groups
     });
+
     if (result && result.ok && result.shareId) {
-      wx.showToast({ title: '共享清单已生成', icon: 'success' });
+      this.setData({ shareId: result.shareId });
       return result.shareId;
     }
-    wx.showToast({ title: '共享失败，已使用普通转发', icon: 'none' });
     return '';
   },
 
   onShareAppMessage() {
+    const title = `我整理了一份「${this.data.title}」，看看有没有漏`;
+    const fallbackPath = this.data.isCustom
+      ? '/pages/index/index'
+      : `/pages/checklist/checklist?id=${this.data.listId}`;
+
     if (cloudApi.isCloudReady()) {
       return {
-        title: `${this.data.title}｜万能生活清单助手`,
-        path: `/pages/checklist/checklist?id=${this.data.listId}`,
+        title,
+        path: fallbackPath,
         promise: this.createCloudShare().then(shareId => ({
-          title: `${this.data.title}｜万能生活清单助手`,
-          path: shareId
-            ? `/pages/checklist/checklist?shareId=${shareId}`
-            : `/pages/checklist/checklist?id=${this.data.listId}`
+          title,
+          path: shareId ? `/pages/checklist/checklist?shareId=${shareId}` : fallbackPath
         }))
       };
     }
+
     return {
-      title: `${this.data.title}｜万能生活清单助手`,
-      path: `/pages/checklist/checklist?id=${this.data.listId}`
+      title,
+      path: fallbackPath
     };
   }
 });

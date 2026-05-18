@@ -1,6 +1,27 @@
 const { categories, getCategoryById, getTemplatesByCategory } = require('../../data/templates');
 const cloudApi = require('../../utils/cloudApi');
 
+function sortCloudRowsByLocalOrder(categoryId, cloudRows) {
+  const localRows = getTemplatesByCategory(categoryId);
+  const orderMap = {};
+  localRows.forEach((item, index) => {
+    orderMap[item.id] = index;
+  });
+
+  return (cloudRows || [])
+    .slice()
+    .sort((a, b) => {
+      const aOrder = orderMap[a.id];
+      const bOrder = orderMap[b.id];
+      const aKnown = typeof aOrder === 'number';
+      const bKnown = typeof bOrder === 'number';
+      if (aKnown && bKnown) return aOrder - bOrder;
+      if (aKnown) return -1;
+      if (bKnown) return 1;
+      return Number(b.heat || 0) - Number(a.heat || 0);
+    });
+}
+
 Page({
   data: {
     categories,
@@ -40,7 +61,7 @@ Page({
     const rows = await cloudApi.getTemplates({ category: categoryId, sortByHot: true, limit: 50 });
     if (!rows || rows.length === 0) return;
     if (this.data.activeCategory === categoryId) {
-      this.setData({ templates: rows });
+      this.setData({ templates: sortCloudRowsByLocalOrder(categoryId, rows) });
     }
   },
 
