@@ -110,15 +110,12 @@
             data-item-index="{{itemIndex}}"
             bindtap="toggleItem"
           >
-            <view
-              wx:if="{{!isCustom}}"
-              class="checkbox {{task.checked ? 'checked' : ''}}"
-            >
+            <view wx:if="{{!isCustom}}" class="checkbox {{task.checked ? 'checked' : ''}}">
               <view wx:if="{{task.checked}}" class="check-mark"></view>
             </view>
-            <view
-              class="task-text {{!isCustom && task.checked ? checkedTextClass : ''}} {{isCustom ? 'readonly-task-text' : ''}}"
-            >{{task.text}}</view>
+            <view class="task-text {{!isCustom && task.checked ? checkedTextClass : ''}} {{isCustom ? 'readonly-task-text' : ''}}">
+              {{task.text}}
+            </view>
             <view
               wx:if="{{!isCustom}}"
               class="task-delete"
@@ -130,16 +127,23 @@
         </view>
       </view>
 
-      <view class="bottom-actions">
-        <button class="reset-btn" wx:if="{{!isCustom}}" bindtap="resetChecklist">
-          <text>重置当前清单</text>
-        </button>
-        <button class="share-bottom-btn" wx:if="{{isCustom}}" open-type="share">
-          <text>分享清单</text>
-        </button>
-        <button class="copy-btn" wx:if="{{!isCustom}}" bindtap="copyChecklist" loading="{{generating}}" disabled="{{generating}}">
-          <text>{{primaryCopyText}}</text>
-        </button>
+      <view class="bottom-actions {{isCustom ? 'custom-actions' : ''}}">
+        <block wx:if="{{isCustom}}">
+          <button class="share-bottom-btn" open-type="share">
+            <text>分享清单</text>
+          </button>
+          <button class="poster-bottom-btn" bindtap="saveSharePoster" loading="{{generating}}" disabled="{{generating}}">
+            <text>保存分享海报</text>
+          </button>
+        </block>
+        <block wx:else>
+          <button class="reset-btn" bindtap="resetChecklist">
+            <text>重置当前清单</text>
+          </button>
+          <button class="copy-btn" bindtap="copyChecklist" loading="{{generating}}" disabled="{{generating}}">
+            <text>{{primaryCopyText}}</text>
+          </button>
+        </block>
       </view>
 
       <view class="bottom-safe"></view>

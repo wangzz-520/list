@@ -107,6 +107,12 @@ async function getShareList(shareId) {
   return result.data || null;
 }
 
+async function getShareQrCode(shareId) {
+  const id = String(shareId || '').trim();
+  if (!id) return { ok: false, reason: 'empty_share_id' };
+  return callFunction('getShareQrCode', { shareId: id });
+}
+
 module.exports = {
   isCloudReady,
   callFunction,
@@ -117,5 +123,6 @@ module.exports = {
   getAdminFeedbacks,
   submitFeedback,
   createShareList,
-  getShareList
+  getShareList,
+  getShareQrCode
 };

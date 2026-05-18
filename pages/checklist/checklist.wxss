@@ -461,7 +461,8 @@
 
 .copy-btn,
 .reset-btn,
-.share-bottom-btn {
+.share-bottom-btn,
+.poster-bottom-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -491,17 +492,34 @@
 }
 
 .share-bottom-btn {
-  flex: 1 1 100%;
-  width: 100%;
+  flex: 1;
+  width: auto;
   min-width: 0;
   color: #2f6fed;
-  background: #edf4ff;
+  background: #ffffff;
   border: 1rpx solid #c9d8fb;
+  box-shadow: 0 8rpx 18rpx rgba(47, 111, 237, 0.08);
+}
+
+.poster-bottom-btn {
+  flex: 1.15;
+  width: auto;
+  min-width: 0;
+  color: #ffffff;
+  background: linear-gradient(135deg, #2f6fed, #5d92ff);
+  box-shadow: 0 12rpx 24rpx rgba(47, 111, 237, 0.18);
+}
+
+.custom-actions {
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 0 2rpx;
 }
 
 .copy-btn::after,
 .reset-btn::after,
-.share-bottom-btn::after {
+.share-bottom-btn::after,
+.poster-bottom-btn::after {
   border: none;
 }
 

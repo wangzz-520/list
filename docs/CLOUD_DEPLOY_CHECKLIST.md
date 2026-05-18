@@ -18,6 +18,8 @@
 - [ ] 部署 `submitFeedback`
 - [ ] 部署 `adminManager`
 - [ ] 部署 `createShareList`
+- [ ] 部署 `getShareQrCode`
+- [ ] 确认 `getShareQrCode/config.json` 已随云函数上传，允许调用 `wxacode.getUnlimited`
 
 ## 数据初始化
 
@@ -38,6 +40,7 @@
 - [ ] 生成后的清单能在“我的”页最近生成中看到
 - [ ] 已生成清单点击“分享清单”后，`shared_lists` 集合新增快照
 - [ ] 分享卡片打开后进入 `/pages/checklist/checklist?shareId=...` 并显示对应清单
+- [ ] 已生成清单点击“保存分享海报”后，图片保存到相册，扫码能打开对应清单
 - [ ] 常用清单设置后重新打开仍保留
 - [ ] 管理员账号能看到“管理员中心”
 - [ ] 普通用户看不到“管理员中心”

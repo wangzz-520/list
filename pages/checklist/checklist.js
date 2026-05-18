@@ -80,6 +80,10 @@ Page({
   },
 
   onLoad(options) {
+    if (options.scene) {
+      this.loadSharedChecklist(decodeURIComponent(options.scene));
+      return;
+    }
     if (options.shareId) {
       this.loadSharedChecklist(options.shareId);
       return;
@@ -434,7 +438,45 @@ Page({
     });
   },
 
-  saveChecklistImage(list) {
+  downloadCloudFile(fileID) {
+    return new Promise(resolve => {
+      if (!fileID || !wx.cloud) {
+        resolve('');
+        return;
+      }
+      wx.cloud.downloadFile({
+        fileID,
+        success: res => resolve(res.tempFilePath || ''),
+        fail: error => {
+          console.warn('download share qr failed:', error);
+          resolve('');
+        }
+      });
+    });
+  },
+
+  base64ToTempFilePath(base64) {
+    return new Promise(resolve => {
+      if (!base64 || !wx.getFileSystemManager) {
+        resolve('');
+        return;
+      }
+      const fs = wx.getFileSystemManager();
+      const filePath = `${wx.env.USER_DATA_PATH}/share_qrcode_${Date.now()}.png`;
+      fs.writeFile({
+        filePath,
+        data: base64,
+        encoding: 'base64',
+        success: () => resolve(filePath),
+        fail: error => {
+          console.warn('write share qr failed:', error);
+          resolve('');
+        }
+      });
+    });
+  },
+
+  saveChecklistImage(list, options = {}) {
     return new Promise(resolve => {
       const ctx = wx.createCanvasContext('checklistPoster', this);
       const rows = flattenPosterItems(list.groups || []);
@@ -443,7 +485,8 @@ Page({
       const renderedRows = rows.slice(0, maxRows);
       const groupCount = renderedRows.filter(row => row.type === 'group').length;
       const rowCount = renderedRows.length - groupCount;
-      const posterHeight = Math.max(900, 360 + groupCount * 50 + rowCount * 44 + 150);
+      const hasQr = !!options.qrPath;
+      const posterHeight = Math.max(860, 300 + groupCount * 50 + rowCount * 44 + (hasQr ? 280 : 150));
       const footerY = posterHeight - 54;
       this.setData({ posterHeight });
 
@@ -452,7 +495,7 @@ Page({
 
       ctx.setFillStyle('#dfeaff');
       ctx.beginPath();
-      ctx.arc(520, 86, 110, 0, Math.PI * 2);
+      ctx.arc(548, 70, 82, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.setFillStyle('#f8fbff');
@@ -464,55 +507,63 @@ Page({
       roundRect(ctx, 34, 34, 532, posterHeight - 68, 28);
       ctx.fill();
 
-      const gradient = ctx.createLinearGradient(34, 34, 566, 196);
-      gradient.addColorStop(0, '#2f6fed');
-      gradient.addColorStop(1, '#6aa7ff');
-      ctx.setFillStyle(gradient);
-      roundRect(ctx, 34, 34, 532, 172, 28);
+      ctx.setFillStyle('#f7fbff');
+      roundRect(ctx, 50, 50, 500, 118, 24);
       ctx.fill();
 
-      ctx.setFillStyle('rgba(255, 255, 255, 0.22)');
+      ctx.setFillStyle('#e7f0ff');
       ctx.beginPath();
-      ctx.arc(492, 74, 64, 0, Math.PI * 2);
+      ctx.arc(520, 68, 48, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.setFillStyle('#ffffff');
-      roundRect(ctx, 58, 58, 62, 62, 16);
+      roundRect(ctx, 68, 70, 54, 54, 14);
       ctx.fill();
+      ctx.setStrokeStyle('#dbe8ff');
+      ctx.setLineWidth(2);
+      roundRect(ctx, 68, 70, 54, 54, 14);
+      ctx.stroke();
 
       ctx.setFillStyle('#2f6fed');
-      ctx.setFontSize(34);
-      ctx.fillText(list.icon || '✓', 72, 101);
+      ctx.setFontSize(29);
+      ctx.fillText(list.icon || '✓', 80, 106);
 
-      ctx.setFillStyle('rgba(255, 255, 255, 0.86)');
-      ctx.setFontSize(18);
-      ctx.fillText('万能生活清单助手', 136, 80);
-
-      ctx.setFillStyle('#ffffff');
-      ctx.setFontSize(31);
-      ctx.fillText(clipText(list.title, 14), 136, 120);
+      ctx.setFillStyle('#5f7190');
+      ctx.setFontSize(17);
+      ctx.fillText('万能生活清单助手', 140, 88);
 
       ctx.setFillStyle('#172033');
-      roundRect(ctx, 58, 232, 484, 74, 18);
+      ctx.setFontSize(30);
+      ctx.fillText(clipText(list.title, 15), 140, 126);
+
+      ctx.setFillStyle('#2f6fed');
+      roundRect(ctx, 428, 104, 82, 30, 15);
+      ctx.fill();
+      ctx.setFillStyle('#ffffff');
+      ctx.setFontSize(15);
+      ctx.fillText('清单海报', 440, 125);
+
+      ctx.setFillStyle('#172033');
+      roundRect(ctx, 58, 190, 484, 70, 18);
       ctx.setFillStyle('#f5f8fd');
       ctx.fill();
 
       ctx.setFillStyle('#2f6fed');
       ctx.setFontSize(24);
-      ctx.fillText(`${itemCount}`, 84, 278);
+      ctx.fillText(`${itemCount}`, 84, 233);
 
       ctx.setFillStyle('#75839a');
       ctx.setFontSize(18);
-      ctx.fillText('个事项已整理好', 128, 276);
+      ctx.fillText('个事项已整理好', 128, 231);
 
       ctx.setFillStyle('#19a974');
-      roundRect(ctx, 408, 250, 108, 32, 16);
+      roundRect(ctx, 408, 211, 108, 32, 16);
       ctx.fill();
       ctx.setFillStyle('#ffffff');
       ctx.setFontSize(16);
-      ctx.fillText('可查看', 436, 272);
+      ctx.fillText('可查看', 436, 233);
 
-      let y = 348;
+      let y = 302;
       let renderedItems = 0;
       renderedRows.forEach(row => {
         if (row.type === 'group') {
@@ -541,7 +592,24 @@ Page({
       if (itemCount > renderedItems) {
         ctx.setFillStyle('#8793a8');
         ctx.setFontSize(18);
-        ctx.fillText(`还有 ${itemCount - renderedItems} 项，请在小程序内查看`, 74, footerY - 28);
+        ctx.fillText(`还有 ${itemCount - renderedItems} 项，请在小程序内查看`, 74, hasQr ? footerY - 172 : footerY - 28);
+      }
+
+      if (hasQr) {
+        const qrY = posterHeight - 214;
+        ctx.setFillStyle('#f5f8fd');
+        roundRect(ctx, 58, qrY - 18, 484, 130, 20);
+        ctx.fill();
+        ctx.setFillStyle('#ffffff');
+        roundRect(ctx, 76, qrY, 104, 104, 16);
+        ctx.fill();
+        ctx.drawImage(options.qrPath, 84, qrY + 8, 88, 88);
+        ctx.setFillStyle('#172033');
+        ctx.setFontSize(22);
+        ctx.fillText('扫码打开这份清单', 204, qrY + 42);
+        ctx.setFillStyle('#75839a');
+        ctx.setFontSize(18);
+        ctx.fillText('复制为我的清单后，可继续查看和复用', 204, qrY + 76);
       }
 
       ctx.setFillStyle('#b2bfd3');
@@ -561,6 +629,47 @@ Page({
         }, 120);
       });
     });
+  },
+
+  async saveSharePoster() {
+    if (this.data.generating) return;
+    if (!cloudApi.isCloudReady()) {
+      wx.showToast({ title: '云同步可用后才能生成小程序码', icon: 'none' });
+      return;
+    }
+    this.setData({ generating: true });
+
+    try {
+      const shareId = await this.createCloudShare();
+      if (!shareId) {
+        wx.showToast({ title: '共享清单生成失败', icon: 'none' });
+        this.setData({ generating: false });
+        return;
+      }
+
+      const qrPath = await this.getShareQrPath(shareId);
+      if (!qrPath) {
+        wx.showToast({ title: '小程序码生成失败', icon: 'none' });
+        this.setData({ generating: false });
+        return;
+      }
+
+      const saved = await this.saveChecklistImage({
+        title: this.data.title,
+        icon: this.data.icon,
+        groups: this.data.groups
+      }, { qrPath });
+
+      wx.showToast({
+        title: saved ? '海报已保存' : '保存失败',
+        icon: saved ? 'success' : 'none'
+      });
+    } catch (error) {
+      console.warn('save share poster failed:', error);
+      wx.showToast({ title: '保存失败', icon: 'none' });
+    }
+
+    this.setData({ generating: false });
   },
 
   async copyChecklist() {
@@ -602,10 +711,15 @@ Page({
       console.warn('custom checklist cloud sync skipped or failed:', syncResult);
       await cloudSync.pushNow();
     }
-    const savedImage = await this.saveChecklistImage(customList);
+    let qrPath = '';
+    if (cloudApi.isCloudReady()) {
+      const shareId = await this.createCloudShareFromList(customList, id);
+      qrPath = await this.getShareQrPath(shareId);
+    }
+    const savedImage = await this.saveChecklistImage(customList, qrPath ? { qrPath } : {});
     this.setData({ generating: false });
     wx.showToast({
-      title: savedImage ? '已保存图片' : (isTemplate ? '已生成' : '已复制'),
+      title: savedImage ? (qrPath ? '海报已保存' : '已保存图片') : (isTemplate ? '已生成' : '已复制'),
       icon: 'success',
       duration: 700
     });
@@ -641,19 +755,49 @@ Page({
     if (this.data.shareId) return this.data.shareId;
     if (!cloudApi.isCloudReady()) return '';
 
-    const result = await cloudApi.createShareList({
-      sourceId: this.data.listId,
+    const shareId = await this.createCloudShareFromList({
+      id: this.data.listId,
       title: this.data.title,
       icon: this.data.icon,
       description: this.data.description,
       groups: this.data.groups
+    }, this.data.listId);
+
+    if (shareId) {
+      this.setData({ shareId });
+      return shareId;
+    }
+    return '';
+  },
+
+  async createCloudShareFromList(list, sourceId) {
+    if (!cloudApi.isCloudReady() || !list) return '';
+
+    const result = await cloudApi.createShareList({
+      sourceId: sourceId || list.id || '',
+      title: list.title,
+      icon: list.icon,
+      description: list.description,
+      groups: list.groups
     });
 
     if (result && result.ok && result.shareId) {
-      this.setData({ shareId: result.shareId });
       return result.shareId;
     }
+    console.warn('create cloud share failed:', result);
     return '';
+  },
+
+  async getShareQrPath(shareId) {
+    if (!shareId || !cloudApi.isCloudReady()) return '';
+
+    const qrResult = await cloudApi.getShareQrCode(shareId);
+    if (!qrResult || !qrResult.ok) {
+      console.warn('get share qr failed:', qrResult);
+      return '';
+    }
+
+    return this.base64ToTempFilePath(qrResult.base64);
   },
 
   onShareAppMessage() {
