@@ -1,5 +1,3 @@
-const cloudConfig = require('../config/cloud');
-
 const KEYS = {
   DRAFTS: 'life_checklist_v1_drafts',
   FAVORITES: 'life_checklist_v1_favorites',
@@ -7,9 +5,7 @@ const KEYS = {
   RECENTS: 'life_checklist_v1_recents',
   COMPLETED_LISTS: 'life_checklist_v1_completed_lists',
   CUSTOM_LISTS: 'life_checklist_v1_custom_lists',
-  DECISION_HISTORY: 'life_checklist_v1_decision_history',
-  FEEDBACKS: 'life_checklist_v1_feedbacks',
-  LAST_CLOUD_SYNC_AT: 'life_checklist_v1_last_cloud_sync_at'
+  DECISION_HISTORY: 'life_checklist_v1_decision_history'
 };
 
 function clone(value) {
@@ -27,50 +23,9 @@ function read(key, fallback) {
   }
 }
 
-function getAppSafe() {
-  try {
-    return typeof getApp === 'function' ? getApp() : null;
-  } catch (error) {
-    return null;
-  }
-}
-
-function canCloudSync() {
-  const app = getAppSafe();
-  return !!(
-    cloudConfig.ENABLE_CLOUD &&
-    app &&
-    app.globalData &&
-    app.globalData.cloudReady &&
-    typeof wx !== 'undefined' &&
-    wx.cloud
-  );
-}
-
-function scheduleCloudPush() {
-  if (!canCloudSync()) return;
-  const app = getAppSafe();
-  clearTimeout(app.globalData.cloudSyncTimer);
-  app.globalData.cloudSyncTimer = setTimeout(() => {
-    const payload = exportUserData();
-    wx.cloud.callFunction({
-      name: 'syncUserData',
-      data: {
-        operation: 'push',
-        payload
-      }
-    }).then(() => {
-      write(KEYS.LAST_CLOUD_SYNC_AT, Date.now(), { silent: true });
-    }).catch(error => {
-      console.warn('cloud sync push failed:', error);
-    });
-  }, cloudConfig.CLOUD_SYNC_DEBOUNCE_MS || 1200);
-}
-
 function write(key, value, options = {}) {
   try {
     wx.setStorageSync(key, value);
-    if (!options.silent) scheduleCloudPush();
     return true;
   } catch (error) {
     console.warn('storage write failed:', key, error);
@@ -163,7 +118,6 @@ function markListCompleted(item) {
   const next = completed.filter(row => !(row.id === item.id && row.completedDate === today));
   next.unshift({
     id: item.id,
-    shareId: item.shareId || '',
     title: item.title,
     icon: item.icon || '✅',
     completedAt: Date.now(),
@@ -207,24 +161,6 @@ function removeCustomList(id) {
   return write(KEYS.CUSTOM_LISTS, lists);
 }
 
-function addFeedback(content) {
-  const feedbacks = read(KEYS.FEEDBACKS, []);
-  feedbacks.unshift({ id: `feedback_${Date.now()}`, content, createdAt: Date.now() });
-  return write(KEYS.FEEDBACKS, feedbacks.slice(0, 30));
-}
-
-function getFeedbacks() {
-  return read(KEYS.FEEDBACKS, []);
-}
-
-function getLastCloudSyncAt() {
-  return read(KEYS.LAST_CLOUD_SYNC_AT, 0);
-}
-
-function markCloudSyncedAt(ts = Date.now()) {
-  return write(KEYS.LAST_CLOUD_SYNC_AT, ts, { silent: true });
-}
-
 function formatDate(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -266,8 +202,6 @@ function clearAllUserData() {
   write(KEYS.COMPLETED_LISTS, []);
   write(KEYS.CUSTOM_LISTS, []);
   write(KEYS.DECISION_HISTORY, []);
-  write(KEYS.FEEDBACKS, []);
-  write(KEYS.LAST_CLOUD_SYNC_AT, 0, { silent: true });
 }
 
 function exportUserData() {
@@ -279,67 +213,8 @@ function exportUserData() {
     recents: read(KEYS.RECENTS, []),
     completedLists: read(KEYS.COMPLETED_LISTS, []),
     customLists: read(KEYS.CUSTOM_LISTS, []),
-    feedbacks: read(KEYS.FEEDBACKS, []),
     exportedAt: Date.now()
   };
-}
-
-function mergeArrayById(localRows, cloudRows, limit) {
-  const map = {};
-  (cloudRows || []).concat(localRows || []).forEach(row => {
-    if (!row || !row.id) return;
-    const existed = map[row.id];
-    if (!existed || Number(row.updatedAt || row.ts || row.createdAt || 0) >= Number(existed.updatedAt || existed.ts || existed.createdAt || 0)) {
-      map[row.id] = row;
-    }
-  });
-  return Object.values(map)
-    .sort((a, b) => Number(b.updatedAt || b.ts || b.createdAt || 0) - Number(a.updatedAt || a.ts || a.createdAt || 0))
-    .slice(0, limit || 1000);
-}
-
-function mergeCompletedLists(localRows, cloudRows, limit) {
-  const map = {};
-  (cloudRows || []).concat(localRows || []).forEach(row => {
-    if (!row || !row.id) return;
-    const key = `${row.id}_${row.completedDate || ''}`;
-    const existed = map[key];
-    if (!existed || Number(row.completedAt || 0) >= Number(existed.completedAt || 0)) {
-      map[key] = row;
-    }
-  });
-  return Object.values(map)
-    .sort((a, b) => Number(b.completedAt || 0) - Number(a.completedAt || 0))
-    .slice(0, limit || 50);
-}
-
-function mergeDrafts(localDrafts, cloudDrafts) {
-  return {
-    ...(cloudDrafts || {}),
-    ...(localDrafts || {})
-  };
-}
-
-function importUserData(cloudData = {}) {
-  const local = exportUserData();
-  const favorites = Array.from(new Set([...(cloudData.favorites || []), ...(local.favorites || [])]));
-  const pinnedTemplates = Array.from(new Set([...(cloudData.pinnedTemplates || []), ...(local.pinnedTemplates || [])])).slice(0, 20);
-  const recents = mergeArrayById(local.recents, cloudData.recents, 12);
-  const completedLists = mergeCompletedLists(local.completedLists, cloudData.completedLists, 50);
-  const customLists = mergeArrayById(local.customLists, cloudData.customLists, 100);
-  const feedbacks = mergeArrayById(local.feedbacks, cloudData.feedbacks, 30);
-  const drafts = mergeDrafts(local.drafts, cloudData.drafts);
-
-  write(KEYS.DRAFTS, drafts, { silent: true });
-  write(KEYS.FAVORITES, favorites, { silent: true });
-  write(KEYS.PINNED_TEMPLATES, pinnedTemplates, { silent: true });
-  write(KEYS.RECENTS, recents, { silent: true });
-  write(KEYS.COMPLETED_LISTS, completedLists, { silent: true });
-  write(KEYS.CUSTOM_LISTS, customLists, { silent: true });
-  write(KEYS.FEEDBACKS, feedbacks, { silent: true });
-  write(KEYS.LAST_CLOUD_SYNC_AT, Date.now(), { silent: true });
-
-  return exportUserData();
 }
 
 module.exports = {
@@ -362,16 +237,10 @@ module.exports = {
   getCustomList,
   saveCustomList,
   removeCustomList,
-  addFeedback,
-  getFeedbacks,
-  getLastCloudSyncAt,
-  markCloudSyncedAt,
   getTodayKey,
   getDecisionHistory,
   addDecisionHistory,
   clearDecisionHistory,
   clearAllUserData,
-  exportUserData,
-  importUserData,
-  scheduleCloudPush
+  exportUserData
 };

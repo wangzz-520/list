@@ -10,7 +10,7 @@
         <view class="title-info">
           <view class="checklist-title">{{title}}</view>
           <view class="checklist-desc">{{description}}</view>
-          <view class="pin-action-row" wx:if="{{!isCustom && !isShared}}">
+          <view class="pin-action-row" wx:if="{{!isCustom}}">
             <view class="pin-inline-btn" bindtap="togglePinned">
               <text>{{isPinned ? '已加入常用' : '设为常用清单'}}</text>
             </view>
@@ -18,7 +18,7 @@
         </view>
       </view>
 
-      <view class="progress-wrap" wx:if="{{!isCustom && !isShared}}">
+      <view class="progress-wrap" wx:if="{{!isCustom}}">
         <view class="progress-meta">
           <text class="progress-label">{{progressLabel}}</text>
           <text class="progress-num">{{progress.done}} / {{progress.total}}</text>
@@ -47,7 +47,7 @@
         />
       </view>
 
-      <view class="add-card" wx:if="{{!isCustom && !isShared}}">
+      <view class="add-card" wx:if="{{!isCustom}}">
         <view class="add-label">快速添加事项</view>
         <picker
           wx:if="{{groupOptions.length > 0}}"
@@ -75,7 +75,7 @@
         </view>
       </view>
 
-      <view wx:if="{{isCustom || isShared}}" class="readonly-list">
+      <view wx:if="{{isCustom}}" class="readonly-list">
         <view wx:for="{{groups}}" wx:key="id" class="readonly-group">
           <view class="readonly-group-title">
             <text>{{item.name}}</text>
@@ -90,7 +90,7 @@
         </view>
       </view>
 
-      <view wx:if="{{!isCustom && !isShared}}" wx:for="{{groups}}" wx:key="id" wx:for-index="groupIndex" class="group-wrap">
+      <view wx:if="{{!isCustom}}" wx:for="{{groups}}" wx:key="id" wx:for-index="groupIndex" class="group-wrap">
         <view class="group-header">
           <text class="group-name">{{item.name}}</text>
           <text class="group-count">{{item.items.length}} 项</text>
@@ -134,11 +134,6 @@
           </button>
           <button class="poster-bottom-btn" bindtap="saveSharePoster" loading="{{generating}}" disabled="{{generating}}">
             <text>保存分享海报</text>
-          </button>
-        </block>
-        <block wx:elif="{{isShared}}">
-          <button class="share-copy-btn" bindtap="copyChecklist" loading="{{generating}}" disabled="{{generating}}">
-            <text>{{primaryCopyText}}</text>
           </button>
         </block>
         <block wx:else>

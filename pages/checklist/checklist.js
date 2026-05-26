@@ -1,7 +1,5 @@
 ﻿const { findTemplateById } = require('../../data/templates');
 const storage = require('../../utils/storage');
-const cloudApi = require('../../utils/cloudApi');
-const cloudSync = require('../../utils/cloudSync');
 const { normalizeGroups, calcProgress, clone } = require('../../utils/checklist');
 
 function leaveInvalidPage() {
@@ -60,7 +58,6 @@ Page({
     nameLabel: '生成后的清单名称',
     icon: '✓',
     description: '',
-    shareId: '',
     originalGroups: [],
     groups: [],
     progress: { total: 0, done: 0, percent: 0 },
@@ -69,70 +66,19 @@ Page({
     checkedTextClass: 'text-done',
     isPinned: false,
     isCustom: false,
-    isShared: false,
     primaryCopyText: '复制为我的清单',
     newItemText: '',
     addGroupIndex: 0,
     groupOptions: [],
     posterHeight: 1400,
-    generating: false,
-    cloudEnabled: false
+    generating: false
   },
 
   onLoad(options) {
-    if (options.scene) {
-      this.loadSharedChecklist(decodeURIComponent(options.scene));
-      return;
-    }
-    if (options.shareId) {
-      this.loadSharedChecklist(options.shareId);
-      return;
-    }
     this.loadChecklist(options.id);
   },
 
-  async loadSharedChecklist(shareId) {
-    const source = await cloudApi.getShareList(shareId);
-    if (!source) {
-      wx.showToast({ title: '共享清单不存在', icon: 'none' });
-      setTimeout(leaveInvalidPage, 800);
-      return;
-    }
-
-    const listId = `share_${source.id}`;
-    const draft = storage.getDraft(listId);
-    const groups = normalizeGroups(source.groups, draft);
-    const progress = calcProgress(groups);
-
-    storage.addRecent({ id: listId, title: source.title, icon: source.icon });
-    wx.setNavigationBarTitle({ title: source.title });
-
-    this.setData({
-      loaded: true,
-      listId,
-      shareId: source.id,
-      title: source.title,
-      listName: `${source.title} 副本`,
-      nameLabel: '复制后的清单名称',
-      icon: source.icon || '✓',
-      description: '来自好友分享的清单快照，可复制为自己的清单继续使用。',
-      originalGroups: source.groups || [],
-      groups,
-      progress,
-      progressLabel: '完成进度',
-      checkedCellClass: 'task-done',
-      checkedTextClass: 'text-done',
-      addGroupIndex: 0,
-      groupOptions: groups.map(group => group.name),
-      isPinned: false,
-      isCustom: false,
-      isShared: true,
-      primaryCopyText: '复制为我的清单',
-      cloudEnabled: cloudApi.isCloudReady()
-    });
-  },
-
-  async loadChecklist(id) {
+  loadChecklist(id) {
     if (!id) {
       wx.showToast({ title: '清单不存在', icon: 'none' });
       setTimeout(leaveInvalidPage, 800);
@@ -147,13 +93,6 @@ Page({
       isCustom = true;
     } else {
       source = findTemplateById(id);
-      const cloudSource = await cloudApi.getTemplateById(id);
-      if (cloudSource) {
-        source = {
-          ...cloudSource,
-          icon: source && source.icon ? source.icon : cloudSource.icon
-        };
-      }
     }
 
     if (!source) {
@@ -172,7 +111,6 @@ Page({
     this.setData({
       loaded: true,
       listId: source.id,
-      shareId: '',
       title: source.title,
       listName: isCustom ? source.title : `我的${source.title}`,
       nameLabel: isCustom ? '清单名称' : '生成后的清单名称',
@@ -188,9 +126,7 @@ Page({
       groupOptions: groups.map(group => group.name),
       isPinned: storage.isPinnedTemplate(source.id),
       isCustom,
-      isShared: false,
-      primaryCopyText: isCustom ? '复制当前清单' : '生成我的清单',
-      cloudEnabled: cloudApi.isCloudReady()
+      primaryCopyText: isCustom ? '复制当前清单' : '生成我的清单'
     });
   },
 
@@ -216,7 +152,7 @@ Page({
   },
 
   handleCompletion(previousProgress, groups) {
-    if (!this.data.isCustom && !this.data.isShared) {
+    if (!this.data.isCustom) {
       return;
     }
     const progress = calcProgress(groups);
@@ -225,7 +161,6 @@ Page({
     }
     storage.markListCompleted({
       id: this.data.listId,
-      shareId: this.data.shareId,
       title: this.data.title,
       icon: this.data.icon,
       progress
@@ -237,7 +172,7 @@ Page({
   },
 
   toggleItem(event) {
-    if (this.data.isCustom || this.data.isShared) {
+    if (this.data.isCustom) {
       return;
     }
     const groupIndex = Number(event.currentTarget.dataset.groupIndex);
@@ -314,9 +249,6 @@ Page({
     if (event && typeof event.stopPropagation === 'function') {
       event.stopPropagation();
     }
-    if (this.data.isShared) {
-      return;
-    }
     const groupIndex = Number(event.currentTarget.dataset.groupIndex);
     const itemIndex = Number(event.currentTarget.dataset.itemIndex);
     const groups = clone(this.data.groups);
@@ -353,10 +285,6 @@ Page({
   togglePinned() {
     if (this.data.isCustom) {
       wx.showToast({ title: '自定义清单不用置顶', icon: 'none' });
-      return;
-    }
-    if (this.data.isShared) {
-      wx.showToast({ title: '共享清单不能设为常用', icon: 'none' });
       return;
     }
     const result = storage.togglePinnedTemplate(this.data.listId);
@@ -441,44 +369,6 @@ Page({
         fail: error => {
           console.warn('save checklist image failed:', error);
           resolve(false);
-        }
-      });
-    });
-  },
-
-  downloadCloudFile(fileID) {
-    return new Promise(resolve => {
-      if (!fileID || !wx.cloud) {
-        resolve('');
-        return;
-      }
-      wx.cloud.downloadFile({
-        fileID,
-        success: res => resolve(res.tempFilePath || ''),
-        fail: error => {
-          console.warn('download share qr failed:', error);
-          resolve('');
-        }
-      });
-    });
-  },
-
-  base64ToTempFilePath(base64) {
-    return new Promise(resolve => {
-      if (!base64 || !wx.getFileSystemManager) {
-        resolve('');
-        return;
-      }
-      const fs = wx.getFileSystemManager();
-      const filePath = `${wx.env.USER_DATA_PATH}/share_qrcode_${Date.now()}.png`;
-      fs.writeFile({
-        filePath,
-        data: base64,
-        encoding: 'base64',
-        success: () => resolve(filePath),
-        fail: error => {
-          console.warn('write share qr failed:', error);
-          resolve('');
         }
       });
     });
@@ -641,32 +531,14 @@ Page({
 
   async saveSharePoster() {
     if (this.data.generating) return;
-    if (!cloudApi.isCloudReady()) {
-      wx.showToast({ title: '云同步可用后才能生成小程序码', icon: 'none' });
-      return;
-    }
     this.setData({ generating: true });
 
     try {
-      const shareId = await this.createCloudShare();
-      if (!shareId) {
-        wx.showToast({ title: '共享清单生成失败', icon: 'none' });
-        this.setData({ generating: false });
-        return;
-      }
-
-      const qrPath = await this.getShareQrPath(shareId);
-      if (!qrPath) {
-        wx.showToast({ title: '小程序码生成失败', icon: 'none' });
-        this.setData({ generating: false });
-        return;
-      }
-
       const saved = await this.saveChecklistImage({
         title: this.data.title,
         icon: this.data.icon,
         groups: this.data.groups
-      }, { qrPath });
+      });
 
       wx.showToast({
         title: saved ? '海报已保存' : '保存失败',
@@ -682,7 +554,7 @@ Page({
 
   async copyChecklist() {
     if (this.data.generating) return;
-    const isTemplate = !this.data.isCustom && !this.data.isShared;
+    const isTemplate = !this.data.isCustom;
     const sourceGroups = this.data.groups;
     const groups = this.buildCustomGroups(sourceGroups, { onlySelected: isTemplate });
     if (isTemplate && groups.length === 0) {
@@ -714,20 +586,10 @@ Page({
       const resetGroups = normalizeGroups(this.data.originalGroups, storage.getDraft(this.data.listId));
       this.refresh(resetGroups);
     }
-    const syncResult = await cloudSync.saveCustomListNow(customList);
-    if (!syncResult || syncResult.ok === false) {
-      console.warn('custom checklist cloud sync skipped or failed:', syncResult);
-      await cloudSync.pushNow();
-    }
-    let qrPath = '';
-    if (cloudApi.isCloudReady()) {
-      const shareId = await this.createCloudShareFromList(customList, id);
-      qrPath = await this.getShareQrPath(shareId);
-    }
-    const savedImage = await this.saveChecklistImage(customList, qrPath ? { qrPath } : {});
+    const savedImage = await this.saveChecklistImage(customList);
     this.setData({ generating: false });
     wx.showToast({
-      title: savedImage ? (qrPath ? '海报已保存' : '已保存图片') : (isTemplate ? '已生成' : '已复制'),
+      title: savedImage ? '已保存图片' : (isTemplate ? '已生成' : '已复制'),
       icon: 'success',
       duration: 700
     });
@@ -759,75 +621,11 @@ Page({
     });
   },
 
-  async createCloudShare() {
-    if (this.data.shareId) return this.data.shareId;
-    if (!cloudApi.isCloudReady()) return '';
-
-    const shareId = await this.createCloudShareFromList({
-      id: this.data.listId,
-      title: this.data.title,
-      icon: this.data.icon,
-      description: this.data.description,
-      groups: this.data.groups
-    }, this.data.listId);
-
-    if (shareId) {
-      this.setData({ shareId });
-      return shareId;
-    }
-    return '';
-  },
-
-  async createCloudShareFromList(list, sourceId) {
-    if (!cloudApi.isCloudReady() || !list) return '';
-
-    const result = await cloudApi.createShareList({
-      sourceId: sourceId || list.id || '',
-      title: list.title,
-      icon: list.icon,
-      description: list.description,
-      groups: list.groups
-    });
-
-    if (result && result.ok && result.shareId) {
-      return result.shareId;
-    }
-    console.warn('create cloud share failed:', result);
-    return '';
-  },
-
-  async getShareQrPath(shareId) {
-    if (!shareId || !cloudApi.isCloudReady()) return '';
-
-    const qrResult = await cloudApi.getShareQrCode(shareId);
-    if (!qrResult || !qrResult.ok) {
-      console.warn('get share qr failed:', qrResult);
-      return '';
-    }
-
-    return this.base64ToTempFilePath(qrResult.base64);
-  },
-
   onShareAppMessage() {
     const title = `我整理了一份「${this.data.title}」，看看有没有漏`;
-    const fallbackPath = this.data.isCustom
-      ? '/pages/index/index'
-      : `/pages/checklist/checklist?id=${this.data.listId}`;
-
-    if (cloudApi.isCloudReady()) {
-      return {
-        title,
-        path: fallbackPath,
-        promise: this.createCloudShare().then(shareId => ({
-          title,
-          path: shareId ? `/pages/checklist/checklist?shareId=${shareId}` : fallbackPath
-        }))
-      };
-    }
-
     return {
       title,
-      path: fallbackPath
+      path: this.data.isCustom ? '/pages/index/index' : `/pages/checklist/checklist?id=${this.data.listId}`
     };
   }
 });

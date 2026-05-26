@@ -4,13 +4,11 @@ const {
   getTemplatesByCategory
 } = require('../../data/templates');
 const storage = require('../../utils/storage');
-const cloudApi = require('../../utils/cloudApi');
 
 Page({
   data: {
     pinnedTemplates: [],
-    templateSections: [],
-    cloudEnabled: false
+    templateSections: []
   },
 
   onShow() {
@@ -32,8 +30,7 @@ Page({
 
     this.setData({
       pinnedTemplates,
-      templateSections,
-      cloudEnabled: cloudApi.isCloudReady()
+      templateSections
     });
   },
 

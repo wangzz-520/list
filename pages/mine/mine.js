@@ -1,16 +1,5 @@
 const { findTemplateById, getAllTemplates } = require('../../data/templates');
 const storage = require('../../utils/storage');
-const cloudApi = require('../../utils/cloudApi');
-
-function formatTime(ts) {
-  if (!ts) return '尚未同步';
-  const date = new Date(ts);
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hour = String(date.getHours()).padStart(2, '0');
-  const minute = String(date.getMinutes()).padStart(2, '0');
-  return `${month}-${day} ${hour}:${minute}`;
-}
 
 function formatListTime(ts) {
   if (!ts) return '刚刚生成';
@@ -58,12 +47,9 @@ Page({
     customLists: [],
     pinnedTemplates: [],
     stats: {},
-    feedbackText: '',
-    cloudEnabled: false,
     syncStatusText: '本地模式',
-    syncDesc: '当前使用本地缓存',
-    lastSyncText: '尚未同步',
-    isAdmin: false
+    syncDesc: '用户数据仅保存在本机缓存中',
+    lastSyncText: '仅本机保存'
   },
 
   onShow() {
@@ -83,10 +69,6 @@ Page({
     const pinnedTemplates = storage.getPinnedTemplates()
       .map(id => allTemplates.find(item => item.id === id))
       .filter(Boolean);
-    const cloudEnabled = cloudApi.isCloudReady();
-
-    const lastSyncAt = storage.getLastCloudSyncAt();
-
     this.setData({
       customLists,
       pinnedTemplates,
@@ -94,39 +76,19 @@ Page({
         customCount: customLists.length,
         pinnedCount: pinnedTemplates.length
       },
-      cloudEnabled,
-      syncStatusText: cloudEnabled ? '云同步可用' : '本地模式',
-      syncDesc: cloudEnabled
-        ? `云端连接正常，最近同步：${formatTime(lastSyncAt)}`
-        : '当前使用本地缓存，配置云环境后可同步',
-      lastSyncText: cloudEnabled ? formatTime(lastSyncAt) : '未启用云同步'
+      syncStatusText: '本地模式',
+      syncDesc: '用户数据仅保存在本机缓存中',
+      lastSyncText: '仅本机保存'
     });
-
-    if (cloudEnabled) {
-      cloudApi.getAdminState().then(result => {
-        this.setData({ isAdmin: !!(result && result.isAdmin) });
-      });
-    } else {
-      this.setData({ isAdmin: false });
-    }
   },
 
   goChecklist(event) {
     const id = event.currentTarget.dataset.id;
-    const shareId = event.currentTarget.dataset.shareId;
-    if (shareId) {
-      wx.navigateTo({ url: `/pages/checklist/checklist?shareId=${shareId}` });
-      return;
-    }
     wx.navigateTo({ url: `/pages/checklist/checklist?id=${id}` });
   },
 
   goDecision() {
     wx.navigateTo({ url: '/pages/decision/decision' });
-  },
-
-  goAdmin() {
-    wx.navigateTo({ url: '/pages/admin/admin' });
   },
 
   copyList(event) {
@@ -180,22 +142,6 @@ Page({
         this.refresh();
       }
     });
-  },
-
-  onFeedbackInput(event) {
-    this.setData({ feedbackText: event.detail.value });
-  },
-
-  async submitFeedback() {
-    const text = String(this.data.feedbackText || '').trim();
-    if (!text) {
-      wx.showToast({ title: '请输入反馈内容', icon: 'none' });
-      return;
-    }
-    storage.addFeedback(text);
-    await cloudApi.submitFeedback(text, { page: 'mine' });
-    this.setData({ feedbackText: '' });
-    wx.showToast({ title: '已提交', icon: 'success' });
   },
 
   onShareAppMessage() {

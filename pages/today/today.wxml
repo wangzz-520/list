@@ -62,7 +62,6 @@
         wx:key="id"
         class="completed-cell"
         data-id="{{item.id}}"
-        data-share-id="{{item.shareId}}"
         bindtap="goChecklist"
         hover-class="cell-hover"
       >

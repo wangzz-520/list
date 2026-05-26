@@ -4,7 +4,7 @@
       <image class="banner-logo" src="/assets/icons/logo.svg" mode="aspectFit"></image>
       <view class="brand-text">
         <view class="brand-name">万能生活清单</view>
-        <view class="brand-desc">本地优先 · 云端同步</view>
+        <view class="brand-desc">本地缓存 · 轻量好用</view>
       </view>
     </view>
     <view class="banner-title">生活清单，一项项不漏</view>

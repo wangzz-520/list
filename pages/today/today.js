@@ -65,11 +65,6 @@ Page({
 
   goChecklist(event) {
     const id = event.currentTarget.dataset.id;
-    const shareId = event.currentTarget.dataset.shareId;
-    if (shareId) {
-      wx.navigateTo({ url: `/pages/checklist/checklist?shareId=${shareId}` });
-      return;
-    }
     wx.navigateTo({ url: `/pages/checklist/checklist?id=${id}` });
   },
 
